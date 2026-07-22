@@ -30,8 +30,11 @@ CLIs, and wires herdr up as a boot-persistent service.
   AGENTS.md tells agents to start every task through it.
 - **axi tools**: `gh-axi`, `aws-axi`, `quota-axi` with their skills and
   SessionStart hooks (deliberately no lavish-axi).
-- **Dev tooling** from nixpkgs: git, gh, aws, gcloud, go, node, rg, fd, jq,
-  fzf, make, htop, etc.
+- **Dev tooling** from nixpkgs: git, gh, aws, gcloud, go, node, terraform,
+  rg, fd, jq, fzf, make, htop, etc.
+- **Familiar shell**: git aliases + settings (`files/gitconfig`, delta pager,
+  rebase pulls, `push.autoSetupRemote`) and the dev-box-relevant subset of my
+  zsh aliases, ported to bash (`g`, `x`, `l`/`la`, `tf`, `gcm`, …).
 - **neovim** with `vim`/`vi` aliases, as `$EDITOR`.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`

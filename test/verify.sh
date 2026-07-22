@@ -60,6 +60,24 @@ check "secrets exported to shells" sh -c \
 check "herdr service loads secrets" grep -q 'EnvironmentFile=-.*agentbox/secrets.env' \
   "$HOME/.config/systemd/user/herdr.service"
 
+# git aliases + settings from files/gitconfig, delta pager, lfs filters
+check "git alias: co" sh -c '[ "$(git config --global --includes alias.co)" = checkout ]'
+check "git alias: recent" sh -c 'git config --global --includes alias.recent | grep -q for-each-ref'
+check "git push.autoSetupRemote" sh -c '[ "$(git config --global --includes push.autoSetupRemote)" = true ]'
+check "git pull.rebase" sh -c '[ "$(git config --global --includes pull.rebase)" = true ]'
+check "git merge.conflictstyle" sh -c '[ "$(git config --global --includes merge.conflictstyle)" = diff3 ]'
+check "git diff pager is delta" sh -c 'git config --global pager.diff | grep -q delta'
+check "git lfs filter configured" sh -c 'git config --global filter.lfs.clean | grep -q git-lfs'
+check "command available: delta" command -v delta
+check "command available: terraform" command -v terraform
+check "command available: column (git recent)" command -v column
+
+# bash aliases ported from zsh dotfiles
+check "bash alias: g=git" sh -c '[ "$(bash -ic "type -t g" 2>/dev/null | tail -1)" = alias ]'
+check "bash alias: x (cd ~/xdev)" sh -c 'bash -ic "alias x" 2>/dev/null | grep -q xdev'
+check "bash alias: gcm" sh -c 'bash -ic "alias gcm" 2>/dev/null | grep -q "git commit -m"'
+check "bash alias: cd - works" sh -c 'bash -ic "alias -- -" 2>/dev/null | grep -q "cd -"'
+
 # git identity: default from git-identity, personal override under ~/xdev/personal
 check "git-identity file created" test -f "$HOME/.config/agentbox/git-identity"
 check "git-identity-personal file created" test -f "$HOME/.config/agentbox/git-identity-personal"

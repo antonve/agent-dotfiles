@@ -94,6 +94,7 @@ in
     nodejs_24
     bun # aws-axi runs on bun
     go
+    terraform # plans only — applies run in CI
     ripgrep
     fd
     jq
@@ -102,6 +103,7 @@ in
     htop
     unzip
     file
+    util-linux # `column`, used by the `git recent` alias
     gnumake
     gcc # nvim-treesitter compiles parsers
 
@@ -115,16 +117,29 @@ in
 
   programs.home-manager.enable = true;
 
+  # diff pager for git (sets core.pager + interactive.diffFilter)
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      navigate = true;
+      light = false;
+    };
+  };
+
   programs.git = {
     enable = true;
+    lfs.enable = true;
     settings = {
       init.defaultBranch = "main";
       pull.rebase = true;
     };
-    # Identity lives in untracked files (bootstrap copies files/git-identity*.example
-    # there). Order-sensitive: the personal include must come after the default
-    # one so it wins for repos under ~/xdev/personal.
+    # Aliases + shared settings live in files/gitconfig (plain gitconfig, ported
+    # from my mac dotfiles). Identity lives in untracked files (bootstrap copies
+    # files/git-identity*.example there). Order-sensitive: the personal include
+    # must come after the default one so it wins for repos under ~/xdev/personal.
     includes = [
+      { path = "${./files/gitconfig}"; }
       { path = "~/.config/agentbox/git-identity"; }
       {
         path = "~/.config/agentbox/git-identity-personal";
@@ -149,7 +164,52 @@ in
 
   programs.bash = {
     enable = true;
+    # ported from my zsh aliases, minus macOS/tmux/kubernetes bits
+    shellAliases = {
+      # navigation
+      ".." = "cd ..";
+      "..." = "cd ../..";
+      "...." = "cd ../../..";
+      "....." = "cd ../../../..";
+      x = "cd ~/xdev";
+      cddot = "cd ~/xdev/agent-dotfiles";
+
+      # git (typo-tolerant)
+      g = "git";
+      got = "git";
+      gut = "git";
+      gitp = "git";
+      gcm = "git commit -m";
+      gca = "git commit --amend";
+
+      # shorthands
+      h = "history";
+      j = "jobs";
+      tf = "terraform";
+      nuke = "kill -9";
+
+      # ls / grep with color (GNU coreutils)
+      ls = "ls --color=auto";
+      l = "ls -lF --color=auto";
+      la = "ls -laF --color=auto";
+      lsd = "ls -lF --color=auto | grep --color=never '^d'";
+      grep = "grep --color=auto";
+      fgrep = "fgrep --color=auto";
+      egrep = "egrep --color=auto";
+
+      # enable alias expansion after sudo
+      sudo = "sudo ";
+
+      # utilities
+      week = "date +%V";
+      timer = ''echo "Timer started. Stop with Ctrl-D." && date && time cat && date'';
+      path = ''echo -e ''${PATH//:/\\n}'';
+      map = "xargs -n1";
+    };
     initExtra = ''
+      # bash needs -- for an alias named "-" (shellAliases can't emit it)
+      alias -- -='cd -'
+
       # nix's profile script skips silently when USER is unset (containers)
       export USER="''${USER:-$(id -un)}"
 
