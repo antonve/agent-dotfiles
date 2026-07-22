@@ -60,6 +60,22 @@ check "secrets exported to shells" sh -c \
 check "herdr service loads secrets" grep -q 'EnvironmentFile=-.*agentbox/secrets.env' \
   "$HOME/.config/systemd/user/herdr.service"
 
+# git identity: default from git-identity, personal override under ~/xdev/personal
+check "git-identity file created" test -f "$HOME/.config/agentbox/git-identity"
+check "git-identity-personal file created" test -f "$HOME/.config/agentbox/git-identity-personal"
+printf '[user]\n\tname = Work Agent\n\temail = work@example.com\n' > "$HOME/.config/agentbox/git-identity"
+printf '[user]\n\temail = personal@example.com\n' > "$HOME/.config/agentbox/git-identity-personal"
+mkdir -p "$HOME/xdev/identity-test" "$HOME/xdev/personal/identity-test"
+git -C "$HOME/xdev/identity-test" init -q
+git -C "$HOME/xdev/personal/identity-test" init -q
+check "git identity: work default" sh -c \
+  '[ "$(git -C "$HOME/xdev/identity-test" config user.email)" = work@example.com ]'
+check "git identity: personal override" sh -c \
+  '[ "$(git -C "$HOME/xdev/personal/identity-test" config user.email)" = personal@example.com ]'
+check "git identity: name inherited in personal" sh -c \
+  '[ "$(git -C "$HOME/xdev/personal/identity-test" config user.name)" = "Work Agent" ]'
+rm -rf "$HOME/xdev/identity-test" "$HOME/xdev/personal/identity-test"
+
 add-ssh-key "ssh-ed25519 AAAATESTKEYAAAA verify@test" >/dev/null 2>&1
 check "add-ssh-key appends key" grep -q AAAATESTKEYAAAA "$HOME/.ssh/authorized_keys"
 add-ssh-key "ssh-ed25519 AAAATESTKEYAAAA verify@test" >/dev/null 2>&1

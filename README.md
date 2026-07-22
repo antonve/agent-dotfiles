@@ -53,8 +53,11 @@ CLIs, and wires herdr up as a boot-persistent service.
 | `home-manager switch --flake ~/xdev/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
 | `nix flake update` (then switch) | bump nixpkgs/herdr/treehouse pins |
 
-Git identity is per-user — set `git config --global user.name/user.email`
-yourself.
+Git identity lives in untracked files: edit
+`~/.config/agentbox/git-identity` (default, work) and
+`~/.config/agentbox/git-identity-personal` (used for repos under
+`~/xdev/personal/**`). Bootstrap seeds both from `files/*.example`; commits
+fail with "Please tell me who you are" until you fill in the default one.
 
 ## Testing
 

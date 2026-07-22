@@ -1,0 +1,7 @@
+# Default git identity on this box — bootstrap.sh copies this to
+# ~/.config/agentbox/git-identity (untracked). Uncomment and fill in your
+# work identity; until you do, git refuses to commit ("Please tell me who
+# you are") rather than guessing wrong.
+[user]
+#	name = Ada Lovelace
+#	email = ada@example.com

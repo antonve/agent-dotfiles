@@ -68,12 +68,22 @@ fi
 # --- secrets file (untracked) --------------------------------------------------
 # Created before the herdr service starts so its EnvironmentFile exists on
 # first launch. Perms are (re)tightened on every run.
+mkdir -p "$HOME/.config/agentbox"
 if [ ! -f "$HOME/.config/agentbox/secrets.env" ]; then
   log "creating ~/.config/agentbox/secrets.env (add your API keys there)"
-  mkdir -p "$HOME/.config/agentbox"
   install -m 600 "$REPO_DIR/secrets.env.example" "$HOME/.config/agentbox/secrets.env"
 fi
 chmod 600 "$HOME/.config/agentbox/secrets.env"
+
+# --- git identity (untracked) --------------------------------------------------
+# Default identity + override for repos under ~/xdev/personal (see the
+# includes in home.nix).
+for f in git-identity git-identity-personal; do
+  if [ ! -f "$HOME/.config/agentbox/$f" ]; then
+    log "creating ~/.config/agentbox/$f (set your git name/email there)"
+    install -m 644 "$REPO_DIR/files/$f.example" "$HOME/.config/agentbox/$f"
+  fi
+done
 
 # --- home-manager switch -----------------------------------------------------
 ARCH="$(uname -m)" # x86_64 | aarch64

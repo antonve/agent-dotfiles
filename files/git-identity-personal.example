@@ -1,0 +1,6 @@
+# Identity for personal repos under ~/xdev/personal/** — overrides
+# git-identity for that directory tree only. Typically your public GitHub
+# noreply address. Copied to ~/.config/agentbox/git-identity-personal
+# (untracked) by bootstrap.sh.
+[user]
+#	email = 12345+username@users.noreply.github.com

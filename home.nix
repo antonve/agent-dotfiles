@@ -121,6 +121,16 @@ in
       init.defaultBranch = "main";
       pull.rebase = true;
     };
+    # Identity lives in untracked files (bootstrap copies files/git-identity*.example
+    # there). Order-sensitive: the personal include must come after the default
+    # one so it wins for repos under ~/xdev/personal.
+    includes = [
+      { path = "~/.config/agentbox/git-identity"; }
+      {
+        path = "~/.config/agentbox/git-identity-personal";
+        condition = "gitdir:~/xdev/personal/**";
+      }
+    ];
   };
 
   programs.neovim = {
