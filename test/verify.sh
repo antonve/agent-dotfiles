@@ -34,12 +34,15 @@ check "AGENTS.md mentions treehouse" grep -q treehouse "$HOME/.claude/CLAUDE.md"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
 echo "==> installing nvim plugins headlessly (lazy.nvim + treesitter)"
-if nvim --headless '+Lazy! sync' +qa >/dev/null 2>&1; then
-  echo "ok   lazy.nvim sync"
+# restore, not sync: sync updates plugins and rewrites lazy-lock.json
+if nvim --headless '+Lazy! restore' +qa >/dev/null 2>&1; then
+  echo "ok   lazy.nvim restore"
 else
-  echo "FAIL lazy.nvim sync"
+  echo "FAIL lazy.nvim restore"
   fail=1
 fi
+check "lazy-lock.json untouched by plugin install" sh -c \
+  'git -C "$HOME/xdev/personal/agent-dotfiles" diff --quiet -- nvim/lazy-lock.json'
 check "plugins installed" sh -c 'ls "$HOME"/.local/share/nvim/lazy | grep -q kanagawa'
 check "nvim leader is comma" sh -c \
   '[ "$(nvim --headless "+lua io.write(vim.g.mapleader)" +q 2>/dev/null)" = "," ]'
