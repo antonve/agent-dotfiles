@@ -185,6 +185,61 @@ in
   xdg.configFile."nvim".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/xdev/personal/agent-dotfiles/nvim";
 
+  # prompt: starship configured like the pure zsh prompt on my mac
+  # (blue path, dimmed git branch + * when dirty, ≡ for stashes, yellow
+  # duration for slow commands, magenta ❯ that turns red on failure)
+  programs.starship = {
+    enable = true;
+    settings =
+      let
+        # zero-width space: makes a status count "present" for the (*...)
+        # group without printing its own symbol (from the official pure preset)
+        zwsp = builtins.fromJSON ''"\u200b"'';
+      in
+      {
+        format = "$username$hostname$directory$git_branch$git_state$git_status$cmd_duration$line_break$character";
+        username = {
+          format = "[$user]($style)";
+          style_user = "bright-black";
+        };
+        hostname = {
+          format = "[@$hostname]($style) ";
+          style = "bright-black";
+          ssh_only = true;
+        };
+        directory.style = "blue";
+        character = {
+          success_symbol = "[❯](purple)";
+          error_symbol = "[❯](red)";
+          vimcmd_symbol = "[❮](green)";
+        };
+        git_branch = {
+          format = "[$branch]($style)";
+          style = "bright-black";
+        };
+        git_status = {
+          format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)";
+          style = "cyan";
+          conflicted = zwsp;
+          untracked = zwsp;
+          modified = zwsp;
+          staged = zwsp;
+          renamed = zwsp;
+          deleted = zwsp;
+          stashed = "≡";
+        };
+        git_state = {
+          format = "\\([$state( $progress_current/$progress_total)]($style)\\) ";
+          style = "bright-black";
+        };
+        cmd_duration = {
+          format = "[$duration]($style) ";
+          style = "yellow";
+          min_time = 5000; # pure's cmd_max_exec_time default
+        };
+      };
+  };
+
   programs.bash = {
     enable = true;
     # ported from my zsh aliases, minus macOS/tmux/kubernetes bits

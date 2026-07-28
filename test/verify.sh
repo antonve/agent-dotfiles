@@ -55,6 +55,12 @@ check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
 check "AGENTS.md forbids AI trailers" grep -qi "Co-Authored-By" "$HOME/.claude/CLAUDE.md"
 
+check "command available: starship" command -v starship
+check "bashrc inits starship" grep -q starship "$HOME/.bashrc"
+check "starship config present" test -f "$HOME/.config/starship.toml"
+check "starship renders pure-style prompt" sh -c \
+  'cd "$HOME/xdev/personal/agent-dotfiles" && TERM=xterm-256color starship prompt --status 0 | grep -q "❯"'
+
 check "LOCALE_ARCHIVE points at nix locale archive" sh -c \
   'bash -ic "echo \$LOCALE_ARCHIVE" 2>/dev/null | tail -1 | grep -q locale-archive'
 
