@@ -168,6 +168,11 @@ in
     defaultEditor = true;
     withRuby = false;
     withPython3 = false;
+    # Don't write the generated init.lua (provider disables) to
+    # ~/.config/nvim/init.lua — that whole dir is the out-of-store symlink
+    # below, and the collision fails the sandboxed home-files build.
+    # Sideloading feeds it through a wrapper arg instead.
+    sideloadInitLua = true;
   };
 
   # nvim config lives in the repo and is symlinked out-of-store so it can be
