@@ -160,7 +160,7 @@ in
   # nvim config lives in the repo and is symlinked out-of-store so it can be
   # edited without a home-manager switch (lazy.nvim manages the plugins).
   xdg.configFile."nvim".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/xdev/agent-dotfiles/nvim";
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/xdev/personal/agent-dotfiles/nvim";
 
   programs.bash = {
     enable = true;
@@ -172,7 +172,7 @@ in
       "...." = "cd ../../..";
       "....." = "cd ../../../..";
       x = "cd ~/xdev";
-      cddot = "cd ~/xdev/agent-dotfiles";
+      cddot = "cd ~/xdev/personal/agent-dotfiles";
 
       # git (typo-tolerant)
       g = "git";
@@ -283,8 +283,8 @@ in
   };
   systemd.user.startServices = true;
 
-  # projects folder convention
+  # projects folder convention (personal/ gets the personal git identity)
   home.activation.xdevDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p "$HOME/xdev"
+    mkdir -p "$HOME/xdev/personal"
   '';
 }

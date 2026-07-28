@@ -10,8 +10,9 @@ curl -fsSL https://raw.githubusercontent.com/antonve/agent-dotfiles/main/bootstr
 ```
 
 Idempotent — re-run any time. It installs nix, clones this repo to
-`~/xdev/agent-dotfiles`, activates the home-manager config, installs the agent
-CLIs, and wires herdr up as a boot-persistent service.
+`~/xdev/personal/agent-dotfiles` (under `personal/` so the personal git
+identity applies to it), activates the home-manager config, installs the
+agent CLIs, and wires herdr up as a boot-persistent service.
 
 ## What you get
 
@@ -53,7 +54,7 @@ CLIs, and wires herdr up as a boot-persistent service.
 |---|---|
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
 | `agentbox-update` | refresh all agent CLIs, axi tools and skills |
-| `home-manager switch --flake ~/xdev/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
+| `home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
 | `nix flake update` (then switch) | bump nixpkgs/herdr/treehouse pins |
 
 Git identity lives in untracked files: edit

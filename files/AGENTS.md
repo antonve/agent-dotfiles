@@ -3,8 +3,8 @@
 This machine is a Debian cloud agent box managed by
 [agent-dotfiles](https://github.com/antonve/agent-dotfiles). The home
 environment is declarative (nix + home-manager) — don't hand-edit managed
-dotfiles; change the repo in `~/xdev/agent-dotfiles` and run
-`home-manager switch --flake ~/xdev/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup`.
+dotfiles; change the repo in `~/xdev/personal/agent-dotfiles` and run
+`home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup`.
 
 ## Worktrees: always start tasks through treehouse
 
@@ -25,7 +25,8 @@ cd "$WT"                      # do all work here
 
 ## Conventions
 
-- All projects live in `~/xdev`. Clone repos there.
+- All projects live in `~/xdev`. Clone repos there. Personal (non-work)
+  repos go under `~/xdev/personal/` — they get the personal git identity.
 - herdr is the terminal multiplexer; agents run inside herdr panes. When
   `HERDR_ENV=1`, use the `herdr` skill for cross-agent communication
   (spawning agents in panes, reading sibling panes, waiting on agents).

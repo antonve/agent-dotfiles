@@ -7,7 +7,9 @@
 set -euo pipefail
 
 REPO_URL="${AGENT_DOTFILES_REPO:-https://github.com/antonve/agent-dotfiles.git}"
-REPO_DIR="$HOME/xdev/agent-dotfiles"
+# Lives under xdev/personal so the personal git identity applies to this
+# (public) repo — see the includeIf in home.nix.
+REPO_DIR="$HOME/xdev/personal/agent-dotfiles"
 
 # derive, don't trust, the caller's USER (sudo/su can leave it stale)
 USER="$(id -un)"
@@ -56,7 +58,7 @@ if [ "${1:-}" = "--nix-only" ]; then
 fi
 
 # --- repo --------------------------------------------------------------------
-mkdir -p "$HOME/xdev"
+mkdir -p "$HOME/xdev/personal"
 if [ ! -d "$REPO_DIR" ]; then
   log "cloning $REPO_URL"
   git clone "$REPO_URL" "$REPO_DIR"

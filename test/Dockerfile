@@ -16,7 +16,7 @@ WORKDIR /home/agent
 COPY --chown=agent:agent bootstrap.sh /tmp/bootstrap.sh
 RUN bash /tmp/bootstrap.sh --nix-only
 
-COPY --chown=agent:agent . xdev/agent-dotfiles
-RUN bash xdev/agent-dotfiles/bootstrap.sh
+COPY --chown=agent:agent . xdev/personal/agent-dotfiles
+RUN bash xdev/personal/agent-dotfiles/bootstrap.sh
 
-RUN bash -lc 'bash ~/xdev/agent-dotfiles/test/verify.sh'
+RUN bash -lc 'bash ~/xdev/personal/agent-dotfiles/test/verify.sh'
