@@ -288,6 +288,16 @@ in
       # bash needs -- for an alias named "-" (shellAliases can't emit it)
       alias -- -='cd -'
 
+      # guard against nesting: bare `herdr` inside a pane attaches a client
+      # inside itself. Subcommands (herdr pane ..., herdr wait ...) still work.
+      herdr() {
+        if [ $# -eq 0 ] && [ "''${HERDR_ENV:-}" = "1" ]; then
+          echo "already inside herdr — ctrl+b d detaches" >&2
+          return 1
+        fi
+        command herdr "$@"
+      }
+
       # nix's profile script skips silently when USER is unset (containers)
       export USER="''${USER:-$(id -un)}"
 
