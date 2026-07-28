@@ -55,6 +55,9 @@ check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
 check "AGENTS.md forbids AI trailers" grep -qi "Co-Authored-By" "$HOME/.claude/CLAUDE.md"
 
+check "LOCALE_ARCHIVE points at nix locale archive" sh -c \
+  'bash -ic "echo \$LOCALE_ARCHIVE" 2>/dev/null | tail -1 | grep -q locale-archive'
+
 check "secrets file created" test -f "$HOME/.config/agentbox/secrets.env"
 check "secrets file is 0600" sh -c '[ "$(stat -c %a "$HOME/.config/agentbox/secrets.env")" = 600 ]'
 echo 'AGENTBOX_TEST_SECRET=works' >> "$HOME/.config/agentbox/secrets.env"

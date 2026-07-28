@@ -92,6 +92,11 @@ in
   # (home-manager replaces the ~/.profile the nix installer hooked into)
   targets.genericLinux.enable = true;
 
+  # nix-built tools (bash etc.) look for locales in the nix locale archive,
+  # not Debian's; without this every shell warns "cannot change locale".
+  home.sessionVariables.LOCALE_ARCHIVE =
+    "${pkgs.glibcLocalesUtf8}/lib/locale/locale-archive";
+
   home.packages = with pkgs; [
     herdrPkg
     treehousePkg
