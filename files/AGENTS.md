@@ -43,6 +43,9 @@ cd "$WT"                      # do all work here
 
 ## Etiquette
 
+- NEVER put AI/tooling metadata in commit messages or PR descriptions: no
+  session links, no `Co-Authored-By`, no "Generated with ..." lines. Commit
+  messages describe the change, nothing else.
 - Never stop the herdr server (`herdr server stop`) or kill its systemd unit —
   other agents run inside it.
 - Don't run destructive or state-changing infrastructure commands (deploys,

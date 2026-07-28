@@ -51,6 +51,9 @@ check "herdr auto-attach has file opt-out" grep -q '.no-herdr' "$HOME/.bashrc"
 check "herdr skill installed for claude" sh -c 'ls "$HOME"/.claude/skills/*herdr*/SKILL.md 2>/dev/null | grep -q .'
 check "gh-axi skill installed (universal)" test -f "$HOME/.agents/skills/gh-axi/SKILL.md"
 check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/settings.json"'
+check "claude commit attribution disabled" sh -c \
+  '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
+check "AGENTS.md forbids AI trailers" grep -qi "Co-Authored-By" "$HOME/.claude/CLAUDE.md"
 
 check "secrets file created" test -f "$HOME/.config/agentbox/secrets.env"
 check "secrets file is 0600" sh -c '[ "$(stat -c %a "$HOME/.config/agentbox/secrets.env")" = 600 ]'

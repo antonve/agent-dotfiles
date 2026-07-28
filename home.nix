@@ -42,6 +42,19 @@ let
     aws-axi setup hooks || echo "warning: aws-axi hook setup failed"
     # quota-axi has no session hooks; its skill runs it on demand via npx
 
+    # no session links / Co-Authored-By trailers in commits — merged (not
+    # written whole) because the axi hooks also edit this file
+    echo "==> disabling claude commit/PR attribution"
+    mkdir -p "$HOME/.claude"
+    if [ -f "$HOME/.claude/settings.json" ]; then
+      ${pkgs.jq}/bin/jq '.attribution = {commit: "", pr: ""}' \
+        "$HOME/.claude/settings.json" > "$HOME/.claude/settings.json.tmp"
+      mv "$HOME/.claude/settings.json.tmp" "$HOME/.claude/settings.json"
+    else
+      printf '{\n  "attribution": { "commit": "", "pr": "" }\n}\n' \
+        > "$HOME/.claude/settings.json"
+    fi
+
     echo "agent box up to date."
   '';
 
