@@ -288,6 +288,8 @@ in
 
       # herdr panes spawn non-login shells from the systemd service; make sure
       # the home-manager session vars (PATH etc.) are loaded regardless.
+      # NOTE: hm-session-vars.sh no-ops when __HM_SESS_VARS_SOURCED is
+      # inherited from an ancestor shell, so PATH is guaranteed again below.
       for hm_vars in \
         "$HOME/.local/state/nix/profiles/home-manager/home-path/etc/profile.d/hm-session-vars.sh" \
         "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"; do
@@ -295,8 +297,17 @@ in
       done
       unset hm_vars
 
-      # go install drops binaries here
-      export PATH="$HOME/go/bin:$PATH"
+      # Guarantee the agent-CLI dirs on PATH in every interactive shell, even
+      # when hm-session-vars was skipped (inherited __HM_SESS_VARS_SOURCED
+      # guard) — this is what made `claude` unfindable in a reloaded shell.
+      for extra_dir in "$HOME/go/bin" "$HOME/.npm-global/bin" "$HOME/.local/bin"; do
+        case ":$PATH:" in
+          *":$extra_dir:"*) ;;
+          *) PATH="$extra_dir:$PATH" ;;
+        esac
+      done
+      unset extra_dir
+      export PATH
 
       # secrets (API keys) — untracked, see secrets.env.example in the repo
       if [ -f "$HOME/.config/agentbox/secrets.env" ]; then

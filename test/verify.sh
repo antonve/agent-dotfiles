@@ -94,6 +94,11 @@ check "bash alias: gcm" sh -c 'bash -ic "alias gcm" 2>/dev/null | grep -q "git c
 check "bash alias: cd - works" sh -c 'bash -ic "alias -- -" 2>/dev/null | grep -q "cd -"'
 check "bash function: reload" sh -c \
   '[ "$(bash -ic "type -t reload" 2>/dev/null | tail -1)" = function ]'
+# agent CLIs must resolve even when hm-session-vars is skipped because the
+# __HM_SESS_VARS_SOURCED guard was inherited (e.g. after `reload`)
+check "claude on PATH despite inherited hm guard" sh -c \
+  'env -i HOME="$HOME" USER="$USER" TERM=xterm __HM_SESS_VARS_SOURCED=1 PATH=/usr/bin:/bin \
+     bash -ic "command -v claude" >/dev/null 2>&1'
 
 # git identity: default from git-identity, personal override under ~/xdev/personal
 check "git-identity file created" test -f "$HOME/.config/agentbox/git-identity"
