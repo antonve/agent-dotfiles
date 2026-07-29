@@ -92,6 +92,9 @@ check "bash alias: g=git" sh -c '[ "$(bash -ic "type -t g" 2>/dev/null | tail -1
 check "bash alias: x (cd ~/xdev)" sh -c 'bash -ic "alias x" 2>/dev/null | grep -q xdev'
 check "bash alias: gcm" sh -c 'bash -ic "alias gcm" 2>/dev/null | grep -q "git commit -m"'
 check "bash alias: cd - works" sh -c 'bash -ic "alias -- -" 2>/dev/null | grep -q "cd -"'
+for fn in reload cdrt mkd whiche; do
+  check "bash function: $fn" sh -c "[ \"\$(bash -ic 'type -t $fn' 2>/dev/null | tail -1)\" = function ]"
+done
 
 # git identity: default from git-identity, personal override under ~/xdev/personal
 check "git-identity file created" test -f "$HOME/.config/agentbox/git-identity"
