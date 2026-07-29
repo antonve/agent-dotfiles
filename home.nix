@@ -288,18 +288,8 @@ in
       # bash needs -- for an alias named "-" (shellAliases can't emit it)
       alias -- -='cd -'
 
-      # functions ported from my zsh dotfiles (functions.zsh)
+      # ported from my zsh dotfiles (functions.zsh)
       reload() { exec bash -l; }
-      cdrt() { # cd to repo root
-        if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-          cd "$(git rev-parse --show-toplevel)"
-        fi
-      }
-      mkd() { mkdir -p "$@" && cd "$@"; }
-      whiche() { # which + edit
-        local file="$(which "$1")"
-        if [ -f "$file" ]; then vim "$file"; else echo "$file"; fi
-      }
 
       # nix's profile script skips silently when USER is unset (containers)
       export USER="''${USER:-$(id -un)}"
