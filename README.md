@@ -48,6 +48,24 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   `systemctl --user restart herdr` (when no agents are mid-task) so the
   server picks up the new values.
 
+## Logging in to codex / opencode (browser OAuth)
+
+Device-code login is disabled, and both `codex login` and
+`opencode auth login` receive their OAuth callback on `localhost:1455`
+*inside the VM* — which your browser can't reach. Connect with the callback
+port forwarded instead:
+
+```sh
+./gcloud-ssh-box.sh    # gcloud compute ssh (IAP tunnel) + -L 1455:localhost:1455
+```
+
+Then run `codex login` (or `opencode auth login`) on the box, open the
+printed URL in your local browser, and the `localhost:1455` redirect gets
+forwarded through the SSH session into the CLI. Log in to one CLI at a time
+(they contend for the same port). The box coordinates live in
+`~/.config/agentbox/box.env` on the machine you connect from (untracked;
+copy `files/box.env.example`).
+
 ## Day-2 commands
 
 | command | what it does |
