@@ -197,16 +197,8 @@ in
         zwsp = builtins.fromJSON ''"\u200b"'';
       in
       {
-        format = "$username$hostname$directory$git_branch$git_state$git_status$cmd_duration$line_break$character";
-        username = {
-          format = "[$user]($style)";
-          style_user = "bright-black";
-        };
-        hostname = {
-          format = "[@$hostname]($style) ";
-          style = "bright-black";
-          ssh_only = true;
-        };
+        # no $username$hostname: the OS Login username is unreadably long
+        format = "$directory$git_branch$git_state$git_status$cmd_duration$line_break$character";
         directory.style = "blue";
         character = {
           success_symbol = "[❯](purple)";
