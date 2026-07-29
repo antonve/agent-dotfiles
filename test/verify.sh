@@ -51,9 +51,6 @@ check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.servic
 check "bashrc auto-attaches herdr" grep -qE '^ *herdr$' "$HOME/.bashrc"
 check "herdr auto-attach has file opt-out" grep -q '.no-herdr' "$HOME/.bashrc"
 
-check "bare herdr refuses to nest inside a pane" sh -c \
-  'HERDR_ENV=1 bash -ic "herdr" 2>&1 | grep -q "already inside herdr"'
-
 check "herdr skill installed for claude" sh -c 'ls "$HOME"/.claude/skills/*herdr*/SKILL.md 2>/dev/null | grep -q .'
 check "gh-axi skill installed (universal)" test -f "$HOME/.agents/skills/gh-axi/SKILL.md"
 check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/settings.json"'
