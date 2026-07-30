@@ -40,6 +40,11 @@ agent CLIs, and wires herdr up as a boot-persistent service.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`
   and `~/.pi/agent/AGENTS.md`.
+- **Managed Pi package**: GitHub dark UI, `ask_user`, `/copy-all`, structured
+  system `fd`/`rg`, Git/model dashboard state, per-run summaries, and visible
+  Herdr orchestration for background commands, Pi/Claude/Codex/OpenCode
+  children, and workflows. Mutation-capable delegation uses guarded Treehouse
+  leases. Firecrawl is intentionally excluded. See [`files/pi/README.md`](files/pi/README.md).
 - `~/xdev` as the projects folder.
 - **Secrets**: `~/.config/agentbox/secrets.env` (untracked, created from
   `secrets.env.example`, chmod 600). Exported into every interactive bash
@@ -74,6 +79,8 @@ copy `files/box.env.example`).
 | `agentbox-update` | refresh all agent CLIs, axi tools and skills |
 | `home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
 | `nix flake update` (then switch) | bump nixpkgs/herdr/treehouse pins |
+| `systemctl --user status pi-herdr-janitor.timer` | inspect durable Herdr/Treehouse cleanup |
+| `journalctl --user -u pi-herdr-janitor.service` | inspect orphan/dirty-lease cleanup diagnostics |
 
 Git identity lives in untracked files: edit
 `~/.config/agentbox/git-identity` (default, work) and

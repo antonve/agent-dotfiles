@@ -4,6 +4,21 @@ let
   herdrPkg = herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
   treehousePkg = treehouse.packages.${pkgs.stdenv.hostPlatform.system}.default;
   agentsMd = ./files/AGENTS.md;
+  piSetupPkg = pkgs.buildNpmPackage {
+    pname = "agentbox-pi-setup";
+    version = "1.0.0";
+    src = ./files/pi;
+    npmDepsFetcherVersion = 2;
+    npmDepsHash = "sha256-Lir3AKgg3a32yU2UzK1NsgxWlVzkUUFVH1+eWfJHcn0=";
+    npmFlags = [ "--legacy-peer-deps" ];
+    dontNpmBuild = true;
+    installPhase = ''
+      runHook preInstall
+      mkdir -p "$out"
+      cp -r extensions skills themes node_modules package.json package-lock.json janitor.ts README.md "$out/"
+      runHook postInstall
+    '';
+  };
 
   # Fast-moving agent CLIs are installed via their native installers / npm so
   # they stay current and can self-update; nixpkgs lags them by weeks.
@@ -29,7 +44,10 @@ let
         -a claude-code codex opencode pi < /dev/null
     }
 
-    echo "==> herdr agent skill (cross-harness comms, all harnesses)"
+    echo "==> herdr integrations + agent skill (cross-harness comms)"
+    for integration in pi claude codex opencode; do
+      herdr integration install "$integration"
+    done
     skill ogulcancelik/herdr herdr
 
     # agent-ergonomic CLI wrappers for the CLIs on this box — deliberately NOT lavish-axi
@@ -343,6 +361,30 @@ in
   home.file.".config/opencode/AGENTS.md".source = agentsMd;
   home.file.".pi/agent/AGENTS.md".source = agentsMd;
 
+  # Merge the managed local Pi package into mutable settings so Pi's own
+  # private selectors remain writable. Herdr's generated extension directory
+  # is deliberately left untouched.
+  home.activation.piSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    settings="$HOME/.pi/agent/settings.json"
+    mkdir -p "$(dirname "$settings")" "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
+    chmod 700 "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
+    if [ -f "$settings" ] && ${pkgs.jq}/bin/jq empty "$settings" >/dev/null 2>&1; then
+      current="$(${pkgs.coreutils}/bin/mktemp)"
+      cp "$settings" "$current"
+    else
+      current="$(${pkgs.coreutils}/bin/mktemp)"
+      printf '{}\n' > "$current"
+    fi
+    ${pkgs.jq}/bin/jq --arg package "${piSetupPkg}" '
+      .theme = "github-dark-default"
+      | .packages = (((.packages // [])
+          | map(select((type != "string") or (test("/nix/store/[^/]+-agentbox-pi-setup-[^/]+$") | not)))) + [$package] | unique)
+    ' "$current" > "$settings.tmp"
+    mv "$settings.tmp" "$settings"
+    chmod 600 "$settings"
+    rm -f "$current"
+  '';
+
   # herdr server as a user service. Combined with `loginctl enable-linger`
   # (done in bootstrap.sh) it starts at boot and survives SSH disconnects and
   # logouts — it is not tied to any login session.
@@ -351,8 +393,11 @@ in
       Description = "herdr agent multiplexer server";
     };
     Service = {
+      # A newer Herdr may already own the socket during a live handoff/update.
+      # Skip rather than entering a restart loop; never stop that live server.
+      ExecCondition = "${pkgs.bash}/bin/bash -c '! ${herdrPkg}/bin/herdr status server >/dev/null 2>&1'";
       ExecStart = "${herdrPkg}/bin/herdr server";
-      Restart = "always";
+      Restart = "on-failure";
       RestartSec = 2;
       # API keys for the agents running in panes ('-' = optional)
       EnvironmentFile = "-%h/.config/agentbox/secrets.env";
@@ -364,6 +409,31 @@ in
     Install = {
       WantedBy = [ "default.target" ];
     };
+  };
+  # Reconcile durable ownership after Pi reloads or abrupt parent-tab closure.
+  # The janitor only closes resources recorded by this package and never stops
+  # the shared Herdr server or force-returns a Treehouse lease.
+  systemd.user.services.pi-herdr-janitor = {
+    Unit.Description = "Clean orphaned Pi Herdr tasks and guarded Treehouse leases";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.nodejs_24}/bin/node ${piSetupPkg}/janitor.ts";
+      Environment = [
+        "PATH=${herdrPkg}/bin:${treehousePkg}/bin:${pkgs.git}/bin:${pkgs.nodejs_24}/bin:/usr/bin:/bin"
+        "PI_HERDR_STATE_DIR=%h/.local/state/pi-herdr"
+        "PI_HERDR_CONFIG_DIR=%h/.config/pi-herdr"
+      ];
+    };
+  };
+  systemd.user.timers.pi-herdr-janitor = {
+    Unit.Description = "Periodically reconcile Pi Herdr ownership";
+    Timer = {
+      OnBootSec = "30s";
+      OnUnitActiveSec = "15s";
+      AccuracySec = "2s";
+      Unit = "pi-herdr-janitor.service";
+    };
+    Install.WantedBy = [ "timers.target" ];
   };
   systemd.user.startServices = true;
 

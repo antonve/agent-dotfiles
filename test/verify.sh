@@ -48,6 +48,17 @@ check "nvim leader is comma" sh -c \
   '[ "$(nvim --headless "+lua io.write(vim.g.mapleader)" +q 2>/dev/null)" = "," ]'
 
 check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.service"
+check "Pi Herdr janitor service unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.service"
+check "Pi Herdr janitor timer unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.timer"
+check "Pi theme selected" sh -c '[ "$(jq -r .theme "$HOME/.pi/agent/settings.json")" = github-dark-default ]'
+check "managed Pi package installed without Firecrawl" sh -c '
+  package=$(jq -r '\'' .packages[] | select(type == "string" and test("agentbox-pi-setup")) '\'' "$HOME/.pi/agent/settings.json" | tail -1)
+  test -f "$package/extensions/orchestration/index.ts" &&
+  test -f "$package/themes/github-dark-default.json" &&
+  ! find "$package" -iname "*firecrawl*" | grep -q .
+'
+check "Herdr-generated Pi integration preserved" test -f "$HOME/.pi/agent/extensions/herdr-agent-state.ts"
+check "managed Pi package starts" pi --offline --list-models
 check "bashrc auto-attaches herdr" grep -qE '^ *herdr$' "$HOME/.bashrc"
 check "herdr auto-attach has file opt-out" grep -q '.no-herdr' "$HOME/.bashrc"
 
