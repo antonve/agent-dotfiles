@@ -36,7 +36,15 @@ cd "$WT"                      # do all work here
 - API keys live in `~/.config/agentbox/secrets.env` (untracked; exported into
   every shell and the herdr server). Never commit or print its contents.
 - Editor: `nvim` (`vim` and `vi` are aliases for it). Common tools available:
-  `gh`, `aws`, `gcloud`, `rg`, `fd`, `jq`, `fzf`, `go`, `node`.
+  `gh`, `aws`, `gcloud`, `rg`, `fd`, `jq`, `fzf`, `go`, `gopls`,
+  `golangci-lint`, `dlv`, `gofumpt`, `goimports`, `staticcheck`,
+  `govulncheck`, and `node`.
+- Herdr background shells can inherit a stale or minimal `PATH`. Before starting
+  a background command, resolve its required executables and either use their
+  absolute paths or prefix the command with
+  `PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"`.
+  Do this especially for Nix, Home Manager, and Go tooling; do not retry by
+  guessing executable locations after a `command not found` failure.
 - Prefer the axi wrappers over the raw CLIs when they exist: `gh-axi` for
   GitHub operations, `aws-axi` for AWS, `quota-axi` for agent-provider quota.
   They are token-efficient and suggest next steps.
