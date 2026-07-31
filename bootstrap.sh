@@ -37,9 +37,13 @@ if ! command -v nix >/dev/null && [ ! -x /nix/var/nix/profiles/default/bin/nix ]
   fi
 fi
 
-# make nix usable in this shell
+# make nix usable in this shell. Prefer the Determinate Nix binary directly:
+# its profile script can be a no-op when an inherited guard says it was
+# already sourced even though the current PATH no longer contains nix.
 if ! command -v nix >/dev/null; then
-  if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+  if [ -x /nix/var/nix/profiles/default/bin/nix ]; then
+    export PATH="/nix/var/nix/profiles/default/bin:$PATH"
+  elif [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
     . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
   elif [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
     . "$HOME/.nix-profile/etc/profile.d/nix.sh"
