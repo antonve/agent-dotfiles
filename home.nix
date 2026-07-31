@@ -130,6 +130,12 @@ in
     nodejs_24
     bun # aws-axi runs on bun
     go
+    delve
+    gofumpt
+    golangci-lint
+    gotools # goimports and other golang.org/x/tools commands
+    go-tools # staticcheck and other honnef.co/go/tools commands
+    govulncheck
     terraform # plans only — applies run in CI
     ripgrep
     fd

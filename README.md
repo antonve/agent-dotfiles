@@ -31,8 +31,9 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   AGENTS.md tells agents to start every task through it.
 - **axi tools**: `gh-axi`, `aws-axi`, `quota-axi` with their skills and
   SessionStart hooks (deliberately no lavish-axi).
-- **Dev tooling** from nixpkgs: git, gh, aws, gcloud, go, node, terraform,
-  rg, fd, jq, fzf, make, htop, etc.
+- **Dev tooling** from nixpkgs: git, gh, aws, gcloud, node, terraform, rg, fd,
+  jq, fzf, make, htop, and a common Go toolset (`gopls`, `golangci-lint`,
+  `dlv`, `gofumpt`, `goimports`, `staticcheck`, and `govulncheck`).
 - **Familiar shell**: git aliases + settings (`files/gitconfig`, delta pager,
   rebase pulls, `push.autoSetupRemote`) and the dev-box-relevant subset of my
   zsh aliases, ported to bash (`g`, `x`, `l`/`la`, `tf`, `gcm`, …).
