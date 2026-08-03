@@ -41,10 +41,12 @@ cd "$WT"                      # do all work here
   `govulncheck`, and `node`.
 - Herdr background shells can inherit a stale or minimal `PATH`. Before starting
   a background command, resolve its required executables and either use their
-  absolute paths or prefix the command with
-  `PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"`.
-  Do this especially for Nix, Home Manager, and Go tooling; do not retry by
-  guessing executable locations after a `command not found` failure.
+  absolute paths or begin the command with
+  `export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH";`.
+  Use `export` for compound commands: a bare `PATH=... command1 && command2`
+  assignment applies only to `command1`. Do this especially for Nix, Home
+  Manager, and Go tooling; do not retry by guessing executable locations after
+  a `command not found` failure.
 - Prefer the axi wrappers over the raw CLIs when they exist: `gh-axi` for
   GitHub operations, `aws-axi` for AWS, `quota-axi` for agent-provider quota.
   They are token-efficient and suggest next steps.
