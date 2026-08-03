@@ -41,9 +41,10 @@ agent CLIs, and wires herdr up as a boot-persistent service.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`
   and `~/.pi/agent/AGENTS.md`.
-- **Managed Pi package**: GitHub dark UI, `ask_user`, `/copy-all`, structured
-  system `fd`/`rg`, Git/model dashboard state, per-run summaries, and visible
-  Herdr orchestration for background commands, Pi/Claude/Codex/OpenCode
+- **Managed Pi package**: GitHub dark UI, `ask_user`, `/copy-all`, calm
+  collapsed tool output, structured system `fd`/`rg`, Git/model dashboard
+  state, per-run summaries, and visible Herdr orchestration for background
+  commands, Pi/Claude/Codex/OpenCode
   children, and workflows. Mutation-capable delegation uses guarded Treehouse
   leases. Firecrawl is intentionally excluded. The package is maintained in
   [`antonve/pi-agent`](https://github.com/antonve/pi-agent).
