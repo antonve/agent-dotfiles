@@ -9,13 +9,9 @@
     };
     herdr.url = "github:ogulcancelik/herdr";
     treehouse.url = "github:kunchenguid/treehouse";
-    piAgent = {
-      url = "github:antonve/pi-agent";
-      flake = false;
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, herdr, treehouse, piAgent }:
+  outputs = { self, nixpkgs, home-manager, herdr, treehouse }:
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
       mkHome = system: home-manager.lib.homeManagerConfiguration {
@@ -24,7 +20,7 @@
           config.allowUnfree = true;
         };
         modules = [ ./home.nix ];
-        extraSpecialArgs = { inherit herdr treehouse piAgent; };
+        extraSpecialArgs = { inherit herdr treehouse; };
       };
     in {
       # bootstrap.sh picks the right one via uname -m

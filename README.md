@@ -46,8 +46,10 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   state, per-run summaries, and visible Herdr orchestration for background
   commands, Pi/Claude/Codex/OpenCode
   children, and workflows. Mutation-capable delegation uses guarded Treehouse
-  leases. Firecrawl is intentionally excluded. The package is maintained in
-  [`antonve/pi-agent`](https://github.com/antonve/pi-agent).
+  leases. Firecrawl is intentionally excluded. Pi loads the mutable
+  `~/xdev/personal/pi-agent` checkout directly; every Pi launch, Home Manager
+  activation, and `agentbox-update` attempts to fast-forward it to the latest
+  `origin/main`.
 - `~/xdev` as the projects folder.
 - **Secrets**: `~/.config/agentbox/secrets.env` (untracked, created from
   `secrets.env.example`, chmod 600). Exported into every interactive bash
@@ -81,7 +83,8 @@ copy `files/box.env.example`).
 | command | what it does |
 |---|---|
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
-| `agentbox-update` | refresh all agent CLIs, axi tools and skills |
+| `agentbox-update` | refresh all agent CLIs, the local `pi-agent` checkout, axi tools and skills |
+| `pi-agent-update` | fast-forward `~/xdev/personal/pi-agent` to the latest `origin/main` immediately |
 | `home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
 | `nix flake update` (then switch) | bump nixpkgs/herdr/treehouse pins |
 | `systemctl --user status pi-herdr-janitor.timer` | inspect durable Herdr/Treehouse cleanup |

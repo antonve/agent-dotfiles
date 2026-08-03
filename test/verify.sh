@@ -14,7 +14,7 @@ check() { # check <description> <command...>
 }
 
 for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
-           add-ssh-key agentbox-update claude codex opencode pi \
+           add-ssh-key agentbox-update pi-agent-update claude codex opencode pi \
            gh-axi aws-axi quota-axi \
            gopls typescript-language-server terraform-ls lua-language-server nil gcc; do
   check "command available: $cmd" command -v "$cmd"
@@ -51,10 +51,13 @@ check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.servic
 check "Pi Herdr janitor service unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.service"
 check "Pi Herdr janitor timer unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.timer"
 check "Pi theme selected" sh -c '[ "$(jq -r .theme "$HOME/.pi/agent/settings.json")" = github-dark-default ]'
-check "managed Pi package installed without Firecrawl" sh -c '
-  package=$(jq -r '\'' .packages[] | select(type == "string" and test("agentbox-pi-setup")) '\'' "$HOME/.pi/agent/settings.json" | tail -1)
+check "latest local Pi package installed without Firecrawl" sh -c '
+  package=$(jq -r '\'' .packages[] | select(type == "string" and endswith("/xdev/personal/pi-agent")) '\'' "$HOME/.pi/agent/settings.json" | tail -1)
+  test "$package" = "$HOME/xdev/personal/pi-agent" &&
   test -f "$package/extensions/orchestration/index.ts" &&
   test -f "$package/themes/github-dark-default.json" &&
+  test "$(git -C "$package" branch --show-current)" = main &&
+  test "$(git -C "$package" rev-parse HEAD)" = "$(git -C "$package" rev-parse origin/main)" &&
   ! find "$package" -iname "*firecrawl*" | grep -q .
 '
 check "Herdr-generated Pi integration preserved" test -f "$HOME/.pi/agent/extensions/herdr-agent-state.ts"

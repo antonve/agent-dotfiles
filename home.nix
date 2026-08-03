@@ -1,24 +1,26 @@
-{ config, pkgs, lib, herdr, treehouse, piAgent, ... }:
+{ config, pkgs, lib, herdr, treehouse, ... }:
 
 let
   herdrPkg = herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
   treehousePkg = treehouse.packages.${pkgs.stdenv.hostPlatform.system}.default;
   agentsMd = ./files/AGENTS.md;
-  piSetupPkg = pkgs.buildNpmPackage {
-    pname = "agentbox-pi-setup";
-    version = "1.0.0";
-    src = piAgent;
-    npmDepsFetcherVersion = 2;
-    npmDepsHash = "sha256-Lir3AKgg3a32yU2UzK1NsgxWlVzkUUFVH1+eWfJHcn0=";
-    npmFlags = [ "--legacy-peer-deps" ];
-    dontNpmBuild = true;
-    installPhase = ''
-      runHook preInstall
-      mkdir -p "$out"
-      cp -r extensions skills themes node_modules package.json package-lock.json janitor.ts README.md "$out/"
-      runHook postInstall
-    '';
+  piAgentDir = "${config.home.homeDirectory}/xdev/personal/pi-agent";
+  piAgentUpdate = pkgs.writeShellApplication {
+    name = "pi-agent-update";
+    runtimeInputs = with pkgs; [ coreutils git nodejs_24 util-linux ];
+    text = builtins.readFile ./pi-agent-update.sh;
   };
+  piWrapper = pkgs.writeShellScriptBin "pi" ''
+    if ! PI_AGENT_UPDATE_QUIET=1 ${piAgentUpdate}/bin/pi-agent-update; then
+      echo "warning: could not update pi-agent; using the current local checkout" >&2
+    fi
+    pi_bin="$HOME/.npm-global/bin/pi"
+    if [ ! -x "$pi_bin" ]; then
+      echo "Pi is not installed; run agentbox-update first." >&2
+      exit 1
+    fi
+    exec "$pi_bin" "$@"
+  '';
 
   # Fast-moving agent CLIs are installed via their native installers / npm so
   # they stay current and can self-update; nixpkgs lags them by weeks.
@@ -38,6 +40,8 @@ let
 
     echo "==> pi"
     npm install --global --ignore-scripts @earendil-works/pi-coding-agent@latest
+
+    ${piAgentUpdate}/bin/pi-agent-update
 
     skill() { # skill <repo> <name>
       timeout 300 npx --yes skills add "$1" --skill "$2" -g -y \
@@ -136,6 +140,8 @@ in
     herdrPkg
     treehousePkg
     agentboxUpdate
+    piAgentUpdate
+    piWrapper
     addSshKey
     claudeTrustSeed
 
@@ -385,10 +391,15 @@ in
   home.file.".config/opencode/AGENTS.md".source = agentsMd;
   home.file.".pi/agent/AGENTS.md".source = agentsMd;
 
-  # Merge the managed local Pi package into mutable settings so Pi's own
-  # private selectors remain writable. Herdr's generated extension directory
+  # Pi loads the mutable personal checkout directly. Every activation updates
+  # it to origin/main before settings are rewritten; agentbox-update does the
+  # same independently of Home Manager. Herdr's generated extension directory
   # is deliberately left untouched.
-  home.activation.piSetup = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.piAgent = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ${piAgentUpdate}/bin/pi-agent-update
+  '';
+
+  home.activation.piSetup = lib.hm.dag.entryAfter [ "piAgent" ] ''
     settings="$HOME/.pi/agent/settings.json"
     mkdir -p "$(dirname "$settings")" "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
     chmod 700 "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
@@ -399,7 +410,7 @@ in
       current="$(${pkgs.coreutils}/bin/mktemp)"
       printf '{}\n' > "$current"
     fi
-    ${pkgs.jq}/bin/jq --arg package "${piSetupPkg}" '
+    ${pkgs.jq}/bin/jq --arg package "${piAgentDir}" '
       .theme = "github-dark-default"
       | .packages = (((.packages // [])
           | map(select((type != "string") or (test("/nix/store/[^/]+-agentbox-pi-setup-[^/]+$") | not)))) + [$package] | unique)
@@ -441,7 +452,7 @@ in
     Unit.Description = "Clean orphaned Pi Herdr tasks and guarded Treehouse leases";
     Service = {
       Type = "oneshot";
-      ExecStart = "${pkgs.nodejs_24}/bin/node ${piSetupPkg}/janitor.ts";
+      ExecStart = "${pkgs.nodejs_24}/bin/node %h/xdev/personal/pi-agent/janitor.ts";
       Environment = [
         "PATH=${herdrPkg}/bin:${treehousePkg}/bin:${pkgs.git}/bin:${pkgs.nodejs_24}/bin:/usr/bin:/bin"
         "PI_HERDR_STATE_DIR=%h/.local/state/pi-herdr"
