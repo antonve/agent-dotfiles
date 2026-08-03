@@ -1,4 +1,4 @@
-{ config, pkgs, lib, herdr, treehouse, ... }:
+{ config, pkgs, lib, herdr, treehouse, piAgent, ... }:
 
 let
   herdrPkg = herdr.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -7,7 +7,7 @@ let
   piSetupPkg = pkgs.buildNpmPackage {
     pname = "agentbox-pi-setup";
     version = "1.0.0";
-    src = ./files/pi;
+    src = piAgent;
     npmDepsFetcherVersion = 2;
     npmDepsHash = "sha256-Lir3AKgg3a32yU2UzK1NsgxWlVzkUUFVH1+eWfJHcn0=";
     npmFlags = [ "--legacy-peer-deps" ];

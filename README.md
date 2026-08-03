@@ -45,7 +45,8 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   system `fd`/`rg`, Git/model dashboard state, per-run summaries, and visible
   Herdr orchestration for background commands, Pi/Claude/Codex/OpenCode
   children, and workflows. Mutation-capable delegation uses guarded Treehouse
-  leases. Firecrawl is intentionally excluded. See [`files/pi/README.md`](files/pi/README.md).
+  leases. Firecrawl is intentionally excluded. The package is maintained in
+  [`antonve/pi-agent`](https://github.com/antonve/pi-agent).
 - `~/xdev` as the projects folder.
 - **Secrets**: `~/.config/agentbox/secrets.env` (untracked, created from
   `secrets.env.example`, chmod 600). Exported into every interactive bash
