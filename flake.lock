@@ -90,11 +90,11 @@
     "piAgent": {
       "flake": false,
       "locked": {
-        "lastModified": 1785746279,
-        "narHash": "sha256-/XD3o+gsb9Dk3gfynj72meiuvaYumh+pFFfVVaJnvXE=",
+        "lastModified": 1785746470,
+        "narHash": "sha256-DV4XIDpUOPd64Ow39wruCbMqCWJkzeKCOi34PFcPJ7A=",
         "owner": "antonve",
         "repo": "pi-agent",
-        "rev": "d38973d7210b0bf8355d9d0df238dc3f2c25863f",
+        "rev": "cbd7e9576e64e574cc0485450bd2e6bd8d423351",
         "type": "github"
       },
       "original": {
