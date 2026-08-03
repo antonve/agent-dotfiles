@@ -5,7 +5,20 @@ set -euo pipefail
 repo_dir="${PI_AGENT_DIR:-${HOME}/xdev/personal/pi-agent}"
 dotfiles_dir="${AGENT_DOTFILES_DIR:-${HOME}/xdev/personal/agent-dotfiles}"
 dotfiles_url="$(git -C "$dotfiles_dir" remote get-url origin)"
-repo_url="${PI_AGENT_REPOSITORY_URL:-${dotfiles_url%/*}/pi-agent.git}"
+case "$dotfiles_url" in
+  git@github.com:*)
+    github_path="${dotfiles_url#git@github.com:}"
+    default_repo_url="https://github.com/${github_path%/*}/pi-agent.git"
+    ;;
+  ssh://git@github.com/*)
+    github_path="${dotfiles_url#ssh://git@github.com/}"
+    default_repo_url="https://github.com/${github_path%/*}/pi-agent.git"
+    ;;
+  *)
+    default_repo_url="${dotfiles_url%/*}/pi-agent.git"
+    ;;
+esac
+repo_url="${PI_AGENT_REPOSITORY_URL:-$default_repo_url}"
 state_dir="${XDG_STATE_HOME:-${HOME}/.local/state}/pi-agent"
 lock_marker="${state_dir}/package-lock.sha256"
 quiet="${PI_AGENT_UPDATE_QUIET:-0}"
@@ -43,7 +56,7 @@ if ! git -C "$repo_dir" diff --quiet || ! git -C "$repo_dir" diff --cached --qui
 fi
 
 current_revision="$(git -C "$repo_dir" rev-parse HEAD)"
-git -C "$repo_dir" fetch --quiet origin main
+git -C "$repo_dir" fetch --quiet "$repo_url" main:refs/remotes/origin/main
 latest_revision="$(git -C "$repo_dir" rev-parse origin/main)"
 if [ "$current_revision" != "$latest_revision" ]; then
   log "==> updating pi-agent main"
