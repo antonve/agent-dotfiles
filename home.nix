@@ -7,7 +7,7 @@ let
   piAgentDir = "${config.home.homeDirectory}/xdev/personal/pi-agent";
   piAgentUpdate = pkgs.writeShellApplication {
     name = "pi-agent-update";
-    runtimeInputs = with pkgs; [ coreutils git nodejs_24 openssh util-linux ];
+    runtimeInputs = with pkgs; [ coreutils git nodejs_24 util-linux ];
     text = builtins.readFile ./pi-agent-update.sh;
   };
   piWrapper = pkgs.writeShellScriptBin "pi" ''
