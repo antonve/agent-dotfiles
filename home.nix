@@ -60,21 +60,38 @@ let
     aws-axi setup hooks || echo "warning: aws-axi hook setup failed"
     # quota-axi has no session hooks; its skill runs it on demand via npx
 
-    # no session links / Co-Authored-By trailers in commits — merged (not
-    # written whole) because the axi hooks also edit this file
-    echo "==> disabling claude commit/PR attribution"
+    # claude settings — merged (not written whole) because the axi hooks also
+    # edit this file. Sets: no session links / Co-Authored-By trailers in
+    # commits; auto permission mode by default; and the trust-seeding
+    # SessionStart hook. The hook entry is dropped-then-appended so repeated
+    # agentbox-update runs don't stack duplicates.
+    echo "==> configuring claude settings (attribution, auto mode, trust seed)"
     mkdir -p "$HOME/.claude"
-    if [ -f "$HOME/.claude/settings.json" ]; then
-      ${pkgs.jq}/bin/jq '.attribution = {commit: "", pr: ""}' \
-        "$HOME/.claude/settings.json" > "$HOME/.claude/settings.json.tmp"
-      mv "$HOME/.claude/settings.json.tmp" "$HOME/.claude/settings.json"
-    else
-      printf '{\n  "attribution": { "commit": "", "pr": "" }\n}\n' \
-        > "$HOME/.claude/settings.json"
+    if [ ! -f "$HOME/.claude/settings.json" ]; then
+      echo '{}' > "$HOME/.claude/settings.json"
     fi
+    ${pkgs.jq}/bin/jq '
+      .attribution = {commit: "", pr: ""}
+      | .permissions.defaultMode = "auto"
+      | .skipAutoPermissionPrompt = true
+      | .hooks.SessionStart = (
+          ((.hooks.SessionStart // [])
+            | map(select(((.hooks // []) | any(.command == "claude-trust-seed")) | not)))
+          + [{matcher: "", hooks: [{type: "command", command: "claude-trust-seed", timeout: 10}]}]
+        )
+    ' "$HOME/.claude/settings.json" > "$HOME/.claude/settings.json.tmp"
+    mv "$HOME/.claude/settings.json.tmp" "$HOME/.claude/settings.json"
 
     echo "agent box up to date."
   '';
+
+  # kept as a separate .sh file (not an inline nix string) so shellcheck runs on
+  # it at build time and `${...}` needs no ''${ escaping
+  claudeTrustSeed = pkgs.writeShellApplication {
+    name = "claude-trust-seed";
+    runtimeInputs = with pkgs; [ jq util-linux coreutils gnugrep ];
+    text = builtins.readFile ./claude-trust-seed.sh;
+  };
 
   addSshKey = pkgs.writeShellScriptBin "add-ssh-key" ''
     set -euo pipefail
@@ -120,6 +137,7 @@ in
     treehousePkg
     agentboxUpdate
     addSshKey
+    claudeTrustSeed
 
     # dev tooling
     git
