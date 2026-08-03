@@ -22,7 +22,22 @@ fi
 : "${AGENTBOX_ZONE:?not set — copy files/box.env.example to ~/.config/agentbox/box.env}"
 : "${AGENTBOX_PROJECT:?not set — copy files/box.env.example to ~/.config/agentbox/box.env}"
 
-exec gcloud compute ssh "$AGENTBOX_VM" \
+# Make it obvious that this terminal tab is attached to the remote agent box.
+# CSI 22/23 saves and restores the existing title in xterm-compatible terminals.
+title_active=
+if [ -t 0 ] || [ -t 1 ]; then
+  if printf '\033[22;0t\033]0;REMOTE - agent box\007' > /dev/tty 2>/dev/null; then
+    title_active=1
+  fi
+fi
+restore_title() {
+  if [ -n "$title_active" ]; then
+    printf '\033[23;0t' > /dev/tty 2>/dev/null || true
+  fi
+}
+trap restore_title EXIT
+
+gcloud compute ssh "$AGENTBOX_VM" \
   --zone "$AGENTBOX_ZONE" \
   --project "$AGENTBOX_PROJECT" \
   --tunnel-through-iap \

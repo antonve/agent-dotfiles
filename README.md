@@ -65,10 +65,12 @@ port forwarded instead:
 ./gcloud-ssh-box.sh    # gcloud compute ssh (IAP tunnel) + -L 1455:localhost:1455
 ```
 
-Then run `codex login` (or `opencode auth login`) on the box, open the
-printed URL in your local browser, and the `localhost:1455` redirect gets
-forwarded through the SSH session into the CLI. Log in to one CLI at a time
-(they contend for the same port). The box coordinates live in
+The script labels the terminal tab `REMOTE - agent box` for the duration of
+the connection and restores its previous title on exit. Then run `codex login`
+(or `opencode auth login`) on the box, open the printed URL in your local
+browser, and the `localhost:1455` redirect gets forwarded through the SSH
+session into the CLI. Log in to one CLI at a time (they contend for the same
+port). The box coordinates live in
 `~/.config/agentbox/box.env` on the machine you connect from (untracked;
 copy `files/box.env.example`).
 
