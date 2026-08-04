@@ -397,6 +397,14 @@ in
   home.file.".config/opencode/AGENTS.md".source = agentsMd;
   home.file.".pi/agent/AGENTS.md".source = agentsMd;
 
+  # Small vendored user-invoked skill, available in every harness without
+  # depending on the upstream dotfiles repository at runtime.
+  home.file.".agents/skills/bro".source = ./files/skills/bro;
+  home.file.".claude/skills/bro".source = ./files/skills/bro;
+  home.file.".codex/skills/bro".source = ./files/skills/bro;
+  home.file.".config/opencode/skills/bro".source = ./files/skills/bro;
+  home.file.".pi/agent/skills/bro".source = ./files/skills/bro;
+
   # Pi loads the mutable personal checkout directly. Every activation updates
   # it to origin/main before settings are rewritten; agentbox-update does the
   # same independently of Home Manager. Herdr's generated extension directory
