@@ -53,6 +53,12 @@ cd "$WT"                      # do all work here
 
 ## Etiquette
 
+- Prefix every agent-authored GitHub comment, review, or reply with a bold
+  `**Reply by <model name>**` header, using the active model's name.
+- When checking code-review comments, reply on GitHub to every relevant review
+  thread with the outcome (addressed, declined with rationale, or clarification
+  requested). Do not process review feedback only locally; keep the back and
+  forth recorded on GitHub.
 - NEVER put AI/tooling metadata in commit messages or PR descriptions: no
   session links, no `Co-Authored-By`, no "Generated with ..." lines. Commit
   messages describe the change, nothing else.
