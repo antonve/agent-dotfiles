@@ -43,7 +43,7 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   and `~/.pi/agent/AGENTS.md`.
 - **Managed Pi package**: GitHub dark UI, `ask_user`, `/copy-all`, calm
   collapsed tool output, structured system `fd`/`rg`, Git/model dashboard
-  state, per-run summaries, and visible Herdr orchestration for background
+  state, Linear read/write tools, per-run summaries, and visible Herdr orchestration for background
   commands, Pi/Claude/Codex/OpenCode
   children, and workflows. Mutation-capable delegation uses guarded Treehouse
   leases. Firecrawl is intentionally excluded. Pi loads the mutable
@@ -54,7 +54,7 @@ agent CLIs, and wires herdr up as a boot-persistent service.
 - **Secrets**: `~/.config/agentbox/secrets.env` (untracked, created from
   `secrets.env.example`, chmod 600). Exported into every interactive bash
   shell and the herdr server, so agents in panes pick up
-  `OPENROUTER_API_KEY` and friends. After editing it, run
+  `OPENROUTER_API_KEY`, `LINEAR_API_KEY`, and friends. After editing it, run
   `systemctl --user restart herdr` (when no agents are mid-task) so the
   server picks up the new values.
 
