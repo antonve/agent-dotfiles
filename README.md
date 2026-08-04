@@ -40,7 +40,8 @@ agent CLIs, and wires herdr up as a boot-persistent service.
 - **neovim** with `vim`/`vi` aliases, as `$EDITOR`.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`
-  and `~/.pi/agent/AGENTS.md`.
+  and `~/.pi/agent/AGENTS.md`. The vendored user-invoked `bro` skill is also
+  available in every harness for restating the last response without jargon.
 - **Managed Pi package**: selectable GitHub Dark or Gruvbox Dark UI, `ask_user`, `/copy-all`, calm
   collapsed tool output, structured system `fd`/`rg`, Git/model dashboard
   state, Linear read/write tools, per-run summaries, and visible Herdr orchestration for background

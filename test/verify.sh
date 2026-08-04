@@ -78,6 +78,9 @@ check "herdr auto-attach has file opt-out" grep -q '.no-herdr' "$HOME/.bashrc"
 
 check "herdr skill installed for claude" sh -c 'ls "$HOME"/.claude/skills/*herdr*/SKILL.md 2>/dev/null | grep -q .'
 check "gh-axi skill installed (universal)" test -f "$HOME/.agents/skills/gh-axi/SKILL.md"
+for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills .pi/agent/skills; do
+  check "bro skill installed: ~/$root" test -f "$HOME/$root/bro/SKILL.md"
+done
 check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/settings.json"'
 check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
