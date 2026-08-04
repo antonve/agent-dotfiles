@@ -55,6 +55,8 @@ check "latest local Pi package installed without Firecrawl" sh -c '
   package=$(jq -r '\'' .packages[] | select(type == "string" and endswith("/xdev/personal/pi-agent")) '\'' "$HOME/.pi/agent/settings.json" | tail -1)
   test "$package" = "$HOME/xdev/personal/pi-agent" &&
   test -f "$package/extensions/orchestration/index.ts" &&
+  test -f "$package/extensions/linear/index.ts" &&
+  test -f "$package/skills/linear/SKILL.md" &&
   test -f "$package/themes/github-dark-default.json" &&
   test "$(git -C "$package" branch --show-current)" = main &&
   test "$(git -C "$package" rev-parse HEAD)" = "$(git -C "$package" rev-parse origin/main)" &&
@@ -83,6 +85,7 @@ check "LOCALE_ARCHIVE points at nix locale archive" sh -c \
 
 check "secrets file created" test -f "$HOME/.config/agentbox/secrets.env"
 check "secrets file is 0600" sh -c '[ "$(stat -c %a "$HOME/.config/agentbox/secrets.env")" = 600 ]'
+check "Linear API key documented" grep -q '^#LINEAR_API_KEY=' "$HOME/xdev/personal/agent-dotfiles/secrets.env.example"
 echo 'AGENTBOX_TEST_SECRET=works' >> "$HOME/.config/agentbox/secrets.env"
 check "secrets exported to shells" sh -c \
   '[ "$(bash -ic "echo \$AGENTBOX_TEST_SECRET" 2>/dev/null | tail -1)" = works ]'
