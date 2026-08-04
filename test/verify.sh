@@ -84,6 +84,7 @@ done
 check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/settings.json"'
 check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
+check "AGENTS.md requires human-focused PR descriptions" grep -q 'concise decision aids for human reviewers' "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md forbids AI trailers" grep -qi "Co-Authored-By" "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md forbids default commit amends and force pushes" grep -q 'Do not amend existing commits or force-push branches by default' "$HOME/.claude/CLAUDE.md"
 
