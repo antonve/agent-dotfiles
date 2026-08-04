@@ -31,6 +31,8 @@ for f in .claude/CLAUDE.md .codex/AGENTS.md .config/opencode/AGENTS.md .pi/agent
   check "agent instructions: ~/$f" test -s "$HOME/$f"
 done
 check "AGENTS.md mentions treehouse" grep -q treehouse "$HOME/.claude/CLAUDE.md"
+check "AGENTS.md requires GitHub model reply headers" grep -q 'Reply by <model name>' "$HOME/.claude/CLAUDE.md"
+check "AGENTS.md requires GitHub review replies" grep -q 'reply on GitHub to every relevant review' "$HOME/.claude/CLAUDE.md"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
 echo "==> installing nvim plugins headlessly (lazy.nvim + treesitter)"
