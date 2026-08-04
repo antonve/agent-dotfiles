@@ -10,6 +10,11 @@ let
     runtimeInputs = with pkgs; [ coreutils git nodejs_24 util-linux ];
     text = builtins.readFile ./pi-agent-update.sh;
   };
+  piTheme = pkgs.writeShellApplication {
+    name = "pi-theme";
+    runtimeInputs = with pkgs; [ coreutils gnugrep jq ];
+    text = builtins.readFile ./pi-theme.sh;
+  };
   piWrapper = pkgs.writeShellScriptBin "pi" ''
     if ! PI_AGENT_UPDATE_QUIET=1 ${piAgentUpdate}/bin/pi-agent-update; then
       echo "warning: could not update pi-agent; using the current local checkout" >&2
@@ -141,6 +146,7 @@ in
     treehousePkg
     agentboxUpdate
     piAgentUpdate
+    piTheme
     piWrapper
     addSshKey
     claudeTrustSeed
@@ -401,8 +407,20 @@ in
 
   home.activation.piSetup = lib.hm.dag.entryAfter [ "piAgent" ] ''
     settings="$HOME/.pi/agent/settings.json"
-    mkdir -p "$(dirname "$settings")" "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
+    theme_file="$HOME/.config/agentbox/pi-theme"
+    mkdir -p "$(dirname "$settings")" "$(dirname "$theme_file")" "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
     chmod 700 "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
+    if [ ! -f "$theme_file" ]; then
+      ${pkgs.coreutils}/bin/install -m 600 ${./files/pi-theme.example} "$theme_file"
+    fi
+    pi_theme="$(${pkgs.gnugrep}/bin/grep -Ev '^[[:space:]]*(#|$)' "$theme_file" | ${pkgs.coreutils}/bin/head -n 1 || true)"
+    case "$pi_theme" in
+      github-dark-default|gruvbox-dark) ;;
+      *)
+        echo "warning: unknown Pi theme '$pi_theme' in $theme_file; using github-dark-default" >&2
+        pi_theme="github-dark-default"
+        ;;
+    esac
     if [ -f "$settings" ] && ${pkgs.jq}/bin/jq empty "$settings" >/dev/null 2>&1; then
       current="$(${pkgs.coreutils}/bin/mktemp)"
       cp "$settings" "$current"
@@ -410,8 +428,8 @@ in
       current="$(${pkgs.coreutils}/bin/mktemp)"
       printf '{}\n' > "$current"
     fi
-    ${pkgs.jq}/bin/jq --arg package "${piAgentDir}" '
-      .theme = "github-dark-default"
+    ${pkgs.jq}/bin/jq --arg package "${piAgentDir}" --arg theme "$pi_theme" '
+      .theme = $theme
       | .packages = (((.packages // [])
           | map(select((type != "string") or (test("/nix/store/[^/]+-agentbox-pi-setup-[^/]+$") | not)))) + [$package] | unique)
     ' "$current" > "$settings.tmp"

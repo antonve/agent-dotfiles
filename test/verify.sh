@@ -52,7 +52,13 @@ check "nvim leader is comma" sh -c \
 check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.service"
 check "Pi Herdr janitor service unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.service"
 check "Pi Herdr janitor timer unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.timer"
-check "Pi theme selected" sh -c '[ "$(jq -r .theme "$HOME/.pi/agent/settings.json")" = github-dark-default ]'
+check "Pi theme preference created" test -f "$HOME/.config/agentbox/pi-theme"
+check "Pi theme preference applied" sh -c '
+  selected=$(grep -Ev "^[[:space:]]*(#|$)" "$HOME/.config/agentbox/pi-theme" | head -n 1)
+  case "$selected" in github-dark-default|gruvbox-dark) ;; *) exit 1 ;; esac
+  [ "$(jq -r .theme "$HOME/.pi/agent/settings.json")" = "$selected" ]
+'
+check "Pi theme selector available" command -v pi-theme
 check "latest local Pi package installed without Firecrawl" sh -c '
   package=$(jq -r '\'' .packages[] | select(type == "string" and endswith("/xdev/personal/pi-agent")) '\'' "$HOME/.pi/agent/settings.json" | tail -1)
   test "$package" = "$HOME/xdev/personal/pi-agent" &&
@@ -60,6 +66,7 @@ check "latest local Pi package installed without Firecrawl" sh -c '
   test -f "$package/extensions/linear/index.ts" &&
   test -f "$package/skills/linear/SKILL.md" &&
   test -f "$package/themes/github-dark-default.json" &&
+  test -f "$package/themes/gruvbox-dark.json" &&
   test "$(git -C "$package" branch --show-current)" = main &&
   test "$(git -C "$package" rev-parse HEAD)" = "$(git -C "$package" rev-parse origin/main)" &&
   ! find "$package" -iname "*firecrawl*" | grep -q .
