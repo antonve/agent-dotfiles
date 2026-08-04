@@ -41,7 +41,7 @@ agent CLIs, and wires herdr up as a boot-persistent service.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`
   and `~/.pi/agent/AGENTS.md`.
-- **Managed Pi package**: GitHub dark UI, `ask_user`, `/copy-all`, calm
+- **Managed Pi package**: selectable GitHub Dark or Gruvbox Dark UI, `ask_user`, `/copy-all`, calm
   collapsed tool output, structured system `fd`/`rg`, Git/model dashboard
   state, Linear read/write tools, per-run summaries, and visible Herdr orchestration for background
   commands, Pi/Claude/Codex/OpenCode
@@ -85,6 +85,7 @@ copy `files/box.env.example`).
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
 | `agentbox-update` | refresh all agent CLIs, the local `pi-agent` checkout, axi tools and skills |
 | `pi-agent-update` | fast-forward `~/xdev/personal/pi-agent` to the latest `origin/main` immediately |
+| `pi-theme [github-dark-default\|gruvbox-dark]` | select this computer's Pi theme and update current settings; existing sessions need `/reload` |
 | `home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
 | `nix flake update` (then switch) | bump nixpkgs/herdr/treehouse pins |
 | `systemctl --user status pi-herdr-janitor.timer` | inspect durable Herdr/Treehouse cleanup |
