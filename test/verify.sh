@@ -75,6 +75,7 @@ check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/set
 check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
 check "AGENTS.md forbids AI trailers" grep -qi "Co-Authored-By" "$HOME/.claude/CLAUDE.md"
+check "AGENTS.md forbids default commit amends and force pushes" grep -q 'Do not amend existing commits or force-push branches by default' "$HOME/.claude/CLAUDE.md"
 
 check "command available: starship" command -v starship
 check "bashrc inits starship" grep -q starship "$HOME/.bashrc"
