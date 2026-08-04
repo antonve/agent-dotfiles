@@ -59,6 +59,11 @@ cd "$WT"                      # do all work here
   thread with the outcome (addressed, declined with rationale, or clarification
   requested). Do not process review feedback only locally; keep the back and
   forth recorded on GitHub.
+- Write PR descriptions as concise decision aids for human reviewers, not
+  exhaustive change logs. Include only the reason for the change, what changed,
+  what reviewers should focus on, material risks, and the rollout/rollback plan.
+  Make the expected reviewer action obvious at first glance; omit routine detail
+  that does not affect the review or decision.
 - NEVER put AI/tooling metadata in commit messages or PR descriptions: no
   session links, no `Co-Authored-By`, no "Generated with ..." lines. Commit
   messages describe the change, nothing else.
