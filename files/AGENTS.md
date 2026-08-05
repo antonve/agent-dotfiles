@@ -66,6 +66,19 @@ cd "$WT"                      # do all work here
   state their purpose and get agreement before implementing them. Prefer small,
   reviewable increments; large batches of code are difficult to verify reliably.
 
+## Planning
+
+- Treat planning as an interactive design process, not a one-shot document.
+  Prefer short back-and-forth exchanges: ask frequent focused questions,
+  investigate plausible approaches, and compare their tradeoffs before settling
+  on a direction.
+- When a plan is finalized, persist it as Markdown under `~/xdev/plans`, the
+  canonical location for all plans. Update the existing plan as decisions,
+  scope, or implementation status change instead of letting it become stale.
+- Split each plan into explicit phases. Represent every actionable step in each
+  phase as a Markdown checkbox (`- [ ]`), and change it to `- [x]` when the step
+  is completed so the plan always shows current progress.
+
 ## Etiquette
 
 - Prefix every agent-authored GitHub comment, review, or reply with a bold
