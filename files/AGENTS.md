@@ -51,6 +51,21 @@ cd "$WT"                      # do all work here
   GitHub operations, `aws-axi` for AWS, `quota-axi` for agent-provider quota.
   They are token-efficient and suggest next steps.
 
+## Scope discipline
+
+- Keep changes strictly within the requested scope. Never broaden a task in the
+  name of "safety," completeness, hardening, or general best practice.
+- For a bug fix or targeted change, make the smallest coherent change that
+  addresses the core issue. Avoid unrelated cleanup, refactors, abstractions,
+  compatibility layers, or defensive code.
+- Verification must be purposeful and proportional to the change. Do not add
+  speculative smoke tests, CI jobs, shell-script tests, or other test
+  infrastructure merely because code was touched. Add tests only when they
+  provide focused evidence for the requested behavior.
+- Treat broader refactors and larger test strategies as separate design work:
+  state their purpose and get agreement before implementing them. Prefer small,
+  reviewable increments; large batches of code are difficult to verify reliably.
+
 ## Etiquette
 
 - Prefix every agent-authored GitHub comment, review, or reply with a bold
