@@ -5,6 +5,25 @@ let
   treehousePkg = treehouse.packages.${pkgs.stdenv.hostPlatform.system}.default;
   agentsMd = ./files/AGENTS.md;
   piAgentDir = "${config.home.homeDirectory}/xdev/personal/pi-agent";
+  githubGuard = pkgs.writeShellApplication {
+    name = "gh";
+    runtimeInputs = with pkgs; [ coreutils ];
+    text = ''
+      exec ${pkgs.bash}/bin/bash ${./github-guard.sh} ${pkgs.gh}/bin/gh "$@"
+    '';
+  };
+  gitGuard = pkgs.writeShellApplication {
+    name = "git";
+    runtimeInputs = with pkgs; [ coreutils ];
+    text = ''
+      exec ${pkgs.bash}/bin/bash ${./git-guard.sh} ${pkgs.git}/bin/git "$@"
+    '';
+  };
+  gitPrePushGuard = pkgs.writeShellApplication {
+    name = "pre-push";
+    runtimeInputs = with pkgs; [ coreutils githubGuard ];
+    text = builtins.readFile ./git-pre-push-guard.sh;
+  };
   piAgentUpdate = pkgs.writeShellApplication {
     name = "pi-agent-update";
     runtimeInputs = with pkgs; [ coreutils git nodejs_24 util-linux ];
@@ -150,11 +169,11 @@ in
     piWrapper
     addSshKey
     claudeTrustSeed
+    githubGuard
 
     # dev tooling
     git
     git-lfs
-    gh
     awscli2
     google-cloud-sdk
     nodejs_24
@@ -189,6 +208,10 @@ in
 
   programs.home-manager.enable = true;
 
+  # Keep Git itself in the managed package set, but place the push guard ahead
+  # of it on PATH without creating a buildEnv collision on bin/git.
+  home.file.".local/bin/git".source = "${gitGuard}/bin/git";
+
   # diff pager for git (sets core.pager + interactive.diffFilter)
   programs.delta = {
     enable = true;
@@ -205,6 +228,7 @@ in
     settings = {
       init.defaultBranch = "main";
       pull.rebase = true;
+      core.hooksPath = "${gitPrePushGuard}/bin";
     };
     # Aliases + shared settings live in files/gitconfig (plain gitconfig, ported
     # from my mac dotfiles). Identity lives in untracked files (bootstrap copies

@@ -81,6 +81,12 @@ cd "$WT"                      # do all work here
 
 ## Etiquette
 
+- GitHub writes are allowed only in repositories owned by the account currently
+  authenticated in `gh`. Never create PRs, issues, comments, reviews, releases,
+  pushes, or other mutations in external repositories, even when asked to
+  contribute upstream, unless the user first changes this machine's declarative
+  guardrail policy themselves. Never bypass the guard with raw HTTP/API calls,
+  alternate binaries, `--no-verify`, disabled hooks, or direct credentials.
 - Prefix every agent-authored GitHub comment, review, or reply with a bold
   `**Reply by <model name>**` header, using the active model's name.
 - When checking code-review comments, reply on GitHub to every relevant review

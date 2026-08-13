@@ -32,6 +32,7 @@ for f in .claude/CLAUDE.md .codex/AGENTS.md .config/opencode/AGENTS.md .pi/agent
 done
 check "AGENTS.md mentions treehouse" grep -q treehouse "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md requires GitHub model reply headers" grep -q 'Reply by <model name>' "$HOME/.claude/CLAUDE.md"
+check "AGENTS.md prohibits external GitHub writes" grep -q 'GitHub writes are allowed only in repositories owned' "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md requires GitHub review replies" grep -q 'reply on GitHub to every relevant review' "$HOME/.claude/CLAUDE.md"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
@@ -110,6 +111,9 @@ check "herdr service loads secrets" grep -q 'EnvironmentFile=-.*agentbox/secrets
 check "git alias: co" sh -c '[ "$(git config --global --includes alias.co)" = checkout ]'
 check "git alias: recent" sh -c 'git config --global --includes alias.recent | grep -q for-each-ref'
 check "git push.autoSetupRemote" sh -c '[ "$(git config --global --includes push.autoSetupRemote)" = true ]'
+check "git external-push guard configured" sh -c 'git config --global core.hooksPath | grep -q /bin'
+check "git push --no-verify blocked" sh -c '! git push --no-verify 2>/dev/null'
+check "GitHub guard regression suite" bash "$HOME/xdev/personal/agent-dotfiles/test/github-guard.sh"
 check "git pull.rebase" sh -c '[ "$(git config --global --includes pull.rebase)" = true ]'
 check "git merge.conflictstyle" sh -c '[ "$(git config --global --includes merge.conflictstyle)" = diff3 ]'
 check "git diff pager is delta" sh -c 'git config --global pager.diff | grep -q delta'
