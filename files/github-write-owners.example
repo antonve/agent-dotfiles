@@ -1,0 +1,5 @@
+# Additional GitHub owners whose repositories may be mutated from this box.
+# The account currently authenticated in `gh` is always allowed automatically.
+# Add one organization or user login per line. Blank lines and comments are ignored.
+#
+# example-work-org

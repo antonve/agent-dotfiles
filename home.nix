@@ -9,7 +9,8 @@ let
     name = "gh";
     runtimeInputs = with pkgs; [ coreutils ];
     text = ''
-      exec ${pkgs.bash}/bin/bash ${./github-guard.sh} ${pkgs.gh}/bin/gh "$@"
+      exec ${pkgs.bash}/bin/bash ${./github-guard.sh} ${pkgs.gh}/bin/gh \
+        "$HOME/.config/agentbox/github-write-owners" "$@"
     '';
   };
   gitGuard = pkgs.symlinkJoin {
@@ -442,7 +443,12 @@ in
   home.activation.piSetup = lib.hm.dag.entryAfter [ "piAgent" ] ''
     settings="$HOME/.pi/agent/settings.json"
     theme_file="$HOME/.config/agentbox/pi-theme"
+    github_owners_file="$HOME/.config/agentbox/github-write-owners"
     mkdir -p "$(dirname "$settings")" "$(dirname "$theme_file")" "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
+    if [ ! -f "$github_owners_file" ]; then
+      ${pkgs.coreutils}/bin/install -m 600 ${./files/github-write-owners.example} "$github_owners_file"
+    fi
+    ${pkgs.coreutils}/bin/chmod 600 "$github_owners_file"
     chmod 700 "$HOME/.config/pi-herdr" "$HOME/.local/state/pi-herdr"
     if [ ! -f "$theme_file" ]; then
       ${pkgs.coreutils}/bin/install -m 600 ${./files/pi-theme.example} "$theme_file"

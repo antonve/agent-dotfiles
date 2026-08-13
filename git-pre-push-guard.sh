@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+allowlist=${GITHUB_WRITE_OWNERS_FILE:-$HOME/.config/agentbox/github-write-owners}
 remote_name=${1:-}
 remote_url=${2:-}
 
@@ -20,7 +21,19 @@ login=$(gh api user --jq .login 2>/dev/null) || {
   exit 1
 }
 
-if [ "${owner,,}" != "${login,,}" ]; then
-  echo "GitHub write guard: refusing push outside authenticated account '$login' (target owner: '$owner')" >&2
-  exit 1
+if [ "${owner,,}" = "${login,,}" ]; then
+  exit 0
 fi
+
+if [ -f "$allowlist" ]; then
+  while IFS= read -r entry || [ -n "$entry" ]; do
+    entry=${entry%%#*}
+    entry=${entry//[[:space:]]/}
+    if [ -n "$entry" ] && [ "${owner,,}" = "${entry,,}" ]; then
+      exit 0
+    fi
+  done < "$allowlist"
+fi
+
+echo "GitHub write guard: refusing push outside authenticated account '$login' and configured write owners (target owner: '$owner')" >&2
+exit 1

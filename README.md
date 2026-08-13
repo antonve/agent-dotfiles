@@ -98,6 +98,13 @@ Git identity lives in untracked files: edit
 `~/xdev/personal/**`). Bootstrap seeds both from `files/*.example`; commits
 fail with "Please tell me who you are" until you fill in the default one.
 
+GitHub writes are limited to the account currently authenticated in `gh` plus
+owners listed in the installation-local
+`~/.config/agentbox/github-write-owners`. Add one trusted work organization or
+user login per line; blank lines and `#` comments are ignored. Bootstrap and
+Home Manager seed an empty 0600 file from
+`files/github-write-owners.example`. Reads from other owners remain available.
+
 ## Testing
 
 Never test against a live agent box; use the docker harness:

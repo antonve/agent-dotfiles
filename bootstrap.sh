@@ -81,6 +81,14 @@ if [ ! -f "$HOME/.config/agentbox/secrets.env" ]; then
 fi
 chmod 600 "$HOME/.config/agentbox/secrets.env"
 
+# --- GitHub write-owner allowlist (untracked) ---------------------------------
+if [ ! -f "$HOME/.config/agentbox/github-write-owners" ]; then
+  log "creating ~/.config/agentbox/github-write-owners (add trusted work organizations there)"
+  install -m 600 "$REPO_DIR/files/github-write-owners.example" \
+    "$HOME/.config/agentbox/github-write-owners"
+fi
+chmod 600 "$HOME/.config/agentbox/github-write-owners"
+
 # --- git identity (untracked) --------------------------------------------------
 # Default identity + override for repos under ~/xdev/personal (see the
 # includes in home.nix).

@@ -2,7 +2,8 @@
 set -euo pipefail
 
 real_gh=$1
-shift
+allowlist=$2
+shift 2
 
 die() {
   printf 'GitHub write guard: %s\n' "$*" >&2
@@ -40,11 +41,21 @@ owner_from_repo() {
 }
 
 assert_owner() {
-  local target_owner=$1 account
+  local target_owner=$1 account entry
   account=$(login)
-  if [ "${target_owner,,}" != "${account,,}" ]; then
-    die "refusing mutation outside authenticated account '$account' (target owner: '$target_owner')"
+  if [ "${target_owner,,}" = "${account,,}" ]; then
+    return
   fi
+  if [ -f "$allowlist" ]; then
+    while IFS= read -r entry || [ -n "$entry" ]; do
+      entry=${entry%%#*}
+      entry=${entry//[[:space:]]/}
+      if [ -n "$entry" ] && [ "${target_owner,,}" = "${entry,,}" ]; then
+        return
+      fi
+    done < "$allowlist"
+  fi
+  die "refusing mutation outside authenticated account '$account' and configured write owners (target owner: '$target_owner')"
 }
 
 assert_repo_target() {

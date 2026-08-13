@@ -32,7 +32,7 @@ for f in .claude/CLAUDE.md .codex/AGENTS.md .config/opencode/AGENTS.md .pi/agent
 done
 check "AGENTS.md mentions treehouse" grep -q treehouse "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md requires GitHub model reply headers" grep -q 'Reply by <model name>' "$HOME/.claude/CLAUDE.md"
-check "AGENTS.md prohibits external GitHub writes" grep -q 'GitHub writes are allowed only in repositories owned' "$HOME/.claude/CLAUDE.md"
+check "AGENTS.md restricts GitHub writes" grep -q 'github-write-owners' "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md requires GitHub review replies" grep -q 'reply on GitHub to every relevant review' "$HOME/.claude/CLAUDE.md"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
@@ -100,6 +100,8 @@ check "LOCALE_ARCHIVE points at nix locale archive" sh -c \
 
 check "secrets file created" test -f "$HOME/.config/agentbox/secrets.env"
 check "secrets file is 0600" sh -c '[ "$(stat -c %a "$HOME/.config/agentbox/secrets.env")" = 600 ]'
+check "GitHub write-owner allowlist created" test -f "$HOME/.config/agentbox/github-write-owners"
+check "GitHub write-owner allowlist is 0600" sh -c '[ "$(stat -c %a "$HOME/.config/agentbox/github-write-owners")" = 600 ]'
 check "Linear API key documented" grep -q '^#LINEAR_API_KEY=' "$HOME/xdev/personal/agent-dotfiles/secrets.env.example"
 echo 'AGENTBOX_TEST_SECRET=works' >> "$HOME/.config/agentbox/secrets.env"
 check "secrets exported to shells" sh -c \

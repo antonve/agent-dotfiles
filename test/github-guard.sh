@@ -18,8 +18,10 @@ esac
 EOF
 chmod +x "$tmp/gh-real"
 export GH_MOCK_LOG=$log
+allowlist=$tmp/github-write-owners
+: > "$allowlist"
 
-guard() { bash "$repo_root/github-guard.sh" "$tmp/gh-real" "$@"; }
+guard() { bash "$repo_root/github-guard.sh" "$tmp/gh-real" "$allowlist" "$@"; }
 expect_blocked() {
   if "$@" >"$tmp/out" 2>"$tmp/err"; then
     echo "expected command to be blocked: $*" >&2
@@ -31,8 +33,10 @@ expect_blocked() {
 # Reads are unaffected.
 guard pr view 1 --repo upstream/project >/dev/null
 
-# Owned writes are allowed; external writes are blocked before execution.
+# Owned and explicitly allowlisted writes are allowed; others are blocked.
 guard issue create --repo alice/project --title test >/dev/null
+printf '# trusted work owner\n Work-Org # inline comment\n' > "$allowlist"
+guard issue create --repo work-org/project --title test >/dev/null
 expect_blocked guard issue create --repo upstream/project --title test
 expect_blocked guard api repos/upstream/project/issues -f title=test
 expect_blocked guard api graphql -f 'query=mutation { test }'
@@ -59,7 +63,8 @@ expect_blocked env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG
 # Pre-push permits owned GitHub remotes and rejects external ones.
 mkdir "$tmp/bin"
 cp "$tmp/gh-real" "$tmp/bin/gh"
-PATH="$tmp/bin:$PATH" bash "$repo_root/git-pre-push-guard.sh" origin git@github.com:alice/project.git
-expect_blocked env PATH="$tmp/bin:$PATH" GH_MOCK_LOG="$log" bash "$repo_root/git-pre-push-guard.sh" upstream https://github.com/upstream/project.git
+PATH="$tmp/bin:$PATH" GITHUB_WRITE_OWNERS_FILE="$allowlist" bash "$repo_root/git-pre-push-guard.sh" origin git@github.com:alice/project.git
+PATH="$tmp/bin:$PATH" GITHUB_WRITE_OWNERS_FILE="$allowlist" bash "$repo_root/git-pre-push-guard.sh" work https://github.com/work-org/project.git
+expect_blocked env PATH="$tmp/bin:$PATH" GH_MOCK_LOG="$log" GITHUB_WRITE_OWNERS_FILE="$allowlist" bash "$repo_root/git-pre-push-guard.sh" upstream https://github.com/upstream/project.git
 
 printf 'github guard tests passed\n'
