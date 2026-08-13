@@ -90,10 +90,12 @@ cd "$WT"                      # do all work here
   `--no-verify`, disabled hooks, or direct credentials.
 - Prefix every agent-authored GitHub comment, review, or reply with a bold
   `**Reply by <model name>**` header, using the active model's name.
-- When checking code-review comments, reply on GitHub to every relevant review
-  thread with the outcome (addressed, declined with rationale, or clarification
-  requested). Do not process review feedback only locally; keep the back and
-  forth recorded on GitHub.
+- When the user asks to handle review comments, ignore automated review-bot
+  comments by default. Only act on comments from antonve, plus any other
+  reviewers the user names explicitly. For those comments, reply on GitHub to
+  every relevant review thread with the outcome (addressed, declined with
+  rationale, or clarification requested). Do not process review feedback only
+  locally; keep the back and forth recorded on GitHub.
 - Write PR descriptions as concise decision aids for human reviewers, not
   exhaustive change logs. Include only the reason for the change, what changed,
   what reviewers should focus on, material risks, and the rollout/rollback plan.
