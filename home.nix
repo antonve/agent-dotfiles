@@ -12,11 +12,14 @@ let
       exec ${pkgs.bash}/bin/bash ${./github-guard.sh} ${pkgs.gh}/bin/gh "$@"
     '';
   };
-  gitGuard = pkgs.writeShellApplication {
-    name = "git";
-    runtimeInputs = with pkgs; [ coreutils ];
-    text = ''
-      exec ${pkgs.bash}/bin/bash ${./git-guard.sh} ${pkgs.git}/bin/git "$@"
+  gitGuard = pkgs.symlinkJoin {
+    name = "git-guarded";
+    paths = [ pkgs.git ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      rm "$out/bin/git"
+      makeWrapper ${pkgs.bash}/bin/bash "$out/bin/git" \
+        --add-flags "${./git-guard.sh} ${pkgs.git}/bin/git"
     '';
   };
   gitPrePushGuard = pkgs.writeShellApplication {
@@ -172,7 +175,6 @@ in
     githubGuard
 
     # dev tooling
-    git
     git-lfs
     awscli2
     google-cloud-sdk
@@ -208,10 +210,6 @@ in
 
   programs.home-manager.enable = true;
 
-  # Keep Git itself in the managed package set, but place the push guard ahead
-  # of it on PATH without creating a buildEnv collision on bin/git.
-  home.file.".local/bin/git".source = "${gitGuard}/bin/git";
-
   # diff pager for git (sets core.pager + interactive.diffFilter)
   programs.delta = {
     enable = true;
@@ -224,6 +222,7 @@ in
 
   programs.git = {
     enable = true;
+    package = gitGuard;
     lfs.enable = true;
     settings = {
       init.defaultBranch = "main";
@@ -389,15 +388,6 @@ in
       done
       unset extra_dir
       export PATH
-      # nix.sh may prepend ~/.nix-profile after hm-session-vars; restore the
-      # guard directory after all generated profile initialization.
-      if [ -f "$HOME/.local/bin/git" ]; then
-        PATH=":$PATH:"
-        PATH="''${PATH//:$HOME\/.local\/bin:/:}"
-        PATH="''${PATH#:}"
-        PATH="''${PATH%:}"
-        export PATH="$HOME/.local/bin:$PATH"
-      fi
 
       # secrets (API keys) — untracked, see secrets.env.example in the repo
       if [ -f "$HOME/.config/agentbox/secrets.env" ]; then
