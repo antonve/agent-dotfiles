@@ -389,6 +389,15 @@ in
       done
       unset extra_dir
       export PATH
+      # nix.sh may prepend ~/.nix-profile after hm-session-vars; restore the
+      # guard directory after all generated profile initialization.
+      if [ -f "$HOME/.local/bin/git" ]; then
+        PATH=":$PATH:"
+        PATH="''${PATH//:$HOME\/.local\/bin:/:}"
+        PATH="''${PATH#:}"
+        PATH="''${PATH%:}"
+        export PATH="$HOME/.local/bin:$PATH"
+      fi
 
       # secrets (API keys) — untracked, see secrets.env.example in the repo
       if [ -f "$HOME/.config/agentbox/secrets.env" ]; then
