@@ -378,11 +378,14 @@ in
       # Guarantee the agent-CLI dirs on PATH in every interactive shell, even
       # when hm-session-vars was skipped (inherited __HM_SESS_VARS_SOURCED
       # guard) — this is what made `claude` unfindable in a reloaded shell.
+      # Re-prepend them in this order so ~/.local/bin guards win over managed
+      # binaries and npm-installed tools.
       for extra_dir in "$HOME/go/bin" "$HOME/.npm-global/bin" "$HOME/.local/bin"; do
-        case ":$PATH:" in
-          *":$extra_dir:"*) ;;
-          *) PATH="$extra_dir:$PATH" ;;
-        esac
+        PATH=":$PATH:"
+        PATH="''${PATH//:$extra_dir:/:}"
+        PATH="''${PATH#:}"
+        PATH="''${PATH%:}"
+        PATH="$extra_dir:$PATH"
       done
       unset extra_dir
       export PATH
