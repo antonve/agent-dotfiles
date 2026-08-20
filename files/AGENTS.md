@@ -58,6 +58,10 @@ cd "$WT"                      # do all work here
 - For a bug fix or targeted change, make the smallest coherent change that
   addresses the core issue. Avoid unrelated cleanup, refactors, abstractions,
   compatibility layers, or defensive code.
+- Do not leave task-specific phase labels, issue IDs, rollout chronology, or
+  implementation-history breadcrumbs in code comments or durable repository
+  documentation. Explain the enduring behavior or constraint instead; keep
+  transient execution tracking in the plan, issue, or pull request.
 - Verification must be purposeful and proportional to the change. Do not add
   speculative smoke tests, CI jobs, shell-script tests, or other test
   infrastructure merely because code was touched. Add tests only when they
