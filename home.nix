@@ -39,9 +39,6 @@ let
     text = builtins.readFile ./pi-theme.sh;
   };
   piWrapper = pkgs.writeShellScriptBin "pi" ''
-    if ! PI_AGENT_UPDATE_QUIET=1 ${piAgentUpdate}/bin/pi-agent-update; then
-      echo "warning: could not update pi-agent; using the current local checkout" >&2
-    fi
     pi_bin="$HOME/.npm-global/bin/pi"
     if [ ! -x "$pi_bin" ]; then
       echo "Pi is not installed; run agentbox-update first." >&2
