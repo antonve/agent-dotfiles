@@ -30,6 +30,12 @@ cd "$WT"                      # do all work here
 - herdr is the terminal multiplexer; agents run inside herdr panes. When
   `HERDR_ENV=1`, use the `herdr` skill for cross-agent communication
   (spawning agents in panes, reading sibling panes, waiting on agents).
+- When beginning work on a Linear issue in Herdr, rename the current tab as soon
+  as the issue identifier and title are known:
+  `herdr tab rename "$HERDR_TAB_ID" "<ISSUE-ID>-<short-topic>"`. Use the exact
+  uppercase issue identifier followed by one to three lowercase title keywords
+  in kebab-case. Keep the label short, rename it again when switching the tab to
+  a different issue, and never rename another tab.
 - Installed harnesses: `claude`, `codex`, `opencode`, `pi`.
 - `agentbox-update` refreshes all agent CLIs and their skills.
 - `add-ssh-key "<public key>"` grants SSH access for a new key.
