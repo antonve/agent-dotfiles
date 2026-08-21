@@ -10,6 +10,7 @@ RUN useradd -m -s /bin/bash agent \
 USER agent
 # docker doesn't set USER, but nix's profile script needs it (sshd sets it on real boxes)
 ENV USER=agent
+ENV AGENTBOX_TEST_CONTAINER=1
 WORKDIR /home/agent
 
 # cache the nix install layer separately from the config
@@ -19,4 +20,6 @@ RUN bash /tmp/bootstrap.sh --nix-only
 COPY --chown=agent:agent . xdev/personal/agent-dotfiles
 RUN bash xdev/personal/agent-dotfiles/bootstrap.sh
 
-RUN bash -lc 'bash ~/xdev/personal/agent-dotfiles/test/verify.sh'
+RUN printf '[user]\n\tname = Work Agent\n\temail = work@example.com\n' > .config/agentbox/git-identity \
+    && printf '[user]\n\temail = personal@example.com\n' > .config/agentbox/git-identity-personal \
+    && bash -lc 'bash ~/xdev/personal/agent-dotfiles/test/verify.sh'
