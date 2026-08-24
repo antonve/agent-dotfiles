@@ -14,7 +14,7 @@ check() { # check <description> <command...>
 }
 
 for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
-           add-ssh-key agentbox-update pi-agent-update claude codex opencode pi \
+           add-ssh-key agentbox-update agentbox-disk-reclaim pi-agent-update claude codex opencode pi \
            gh-axi aws-axi quota-axi \
            gopls typescript-language-server terraform-ls lua-language-server nil gcc; do
   check "command available: $cmd" command -v "$cmd"
@@ -53,6 +53,12 @@ check "nvim leader is comma" sh -c \
 check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.service"
 check "Pi Herdr janitor service unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.service"
 check "Pi Herdr janitor timer unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.timer"
+check "disk reclaim service unit" test -f "$HOME/.config/systemd/user/agentbox-disk-reclaim.service"
+check "disk reclaim timer unit" test -f "$HOME/.config/systemd/user/agentbox-disk-reclaim.timer"
+check "disk reclaim timer is hourly" grep -q 'OnCalendar=hourly' \
+  "$HOME/.config/systemd/user/agentbox-disk-reclaim.timer"
+check "disk reclaim timer is persistent" grep -q 'Persistent=true' \
+  "$HOME/.config/systemd/user/agentbox-disk-reclaim.timer"
 check "Pi theme preference created" test -f "$HOME/.config/agentbox/pi-theme"
 check "Pi theme preference applied" sh -c '
   selected=$(grep -Ev "^[[:space:]]*(#|$)" "$HOME/.config/agentbox/pi-theme" | head -n 1)

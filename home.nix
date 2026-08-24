@@ -38,6 +38,11 @@ let
     runtimeInputs = with pkgs; [ coreutils gnugrep jq ];
     text = builtins.readFile ./pi-theme.sh;
   };
+  agentboxDiskReclaim = pkgs.writeShellApplication {
+    name = "agentbox-disk-reclaim";
+    runtimeInputs = with pkgs; [ coreutils gawk util-linux ];
+    text = builtins.readFile ./agentbox-disk-reclaim.sh;
+  };
   piWrapper = pkgs.writeShellScriptBin "pi" ''
     pi_bin="$HOME/.npm-global/bin/pi"
     if [ ! -x "$pi_bin" ]; then
@@ -168,6 +173,7 @@ in
     piAgentUpdate
     piTheme
     piWrapper
+    agentboxDiskReclaim
     addSshKey
     claudeTrustSeed
     githubGuard
@@ -522,6 +528,33 @@ in
       OnUnitActiveSec = "15s";
       AccuracySec = "2s";
       Unit = "pi-herdr-janitor.service";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
+
+  # Reclaim only disposable data after the root filesystem crosses 80% usage.
+  # Run below normal agent workloads so cleanup does not amplify contention.
+  systemd.user.services.agentbox-disk-reclaim = {
+    Unit.Description = "Reclaim safe disposable agent box disk usage";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${agentboxDiskReclaim}/bin/agentbox-disk-reclaim";
+      TimeoutStartSec = "45min";
+      Nice = 19;
+      IOSchedulingClass = "idle";
+      Environment = [
+        "PATH=%h/.npm-global/bin:%h/.local/bin:%h/go/bin:%h/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin"
+      ];
+    };
+  };
+  systemd.user.timers.agentbox-disk-reclaim = {
+    Unit.Description = "Check hourly for reclaimable agent box disk usage";
+    Timer = {
+      OnCalendar = "hourly";
+      Persistent = true;
+      RandomizedDelaySec = "5min";
+      AccuracySec = "1min";
+      Unit = "agentbox-disk-reclaim.service";
     };
     Install.WantedBy = [ "timers.target" ];
   };
