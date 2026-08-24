@@ -50,6 +50,8 @@ check "plugins installed" sh -c 'ls "$HOME"/.local/share/nvim/lazy | grep -q kan
 check "nvim leader is comma" sh -c \
   '[ "$(nvim --headless "+lua io.write(vim.g.mapleader)" +q 2>/dev/null)" = "," ]'
 
+check "herdr config present" test -f "$HOME/.config/herdr/config.toml"
+check "herdr workspace sidebar shows repo subtitle" grep -q '\$repo' "$HOME/.config/herdr/config.toml"
 check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.service"
 check "Pi Herdr janitor service unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.service"
 check "Pi Herdr janitor timer unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.timer"
