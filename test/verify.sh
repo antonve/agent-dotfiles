@@ -2,6 +2,11 @@
 # Run inside the test container (login shell) after bootstrap.sh.
 set -uo pipefail
 
+if [ "${AGENTBOX_TEST_CONTAINER:-}" != 1 ] || [ ! -f /.dockerenv ]; then
+  echo "error: test/verify.sh may only run inside the Docker test container" >&2
+  exit 2
+fi
+
 fail=0
 check() { # check <description> <command...>
   local desc="$1"; shift
@@ -150,8 +155,6 @@ check "claude on PATH despite inherited hm guard" sh -c \
 # git identity: default from git-identity, personal override under ~/xdev/personal
 check "git-identity file created" test -f "$HOME/.config/agentbox/git-identity"
 check "git-identity-personal file created" test -f "$HOME/.config/agentbox/git-identity-personal"
-printf '[user]\n\tname = Work Agent\n\temail = work@example.com\n' > "$HOME/.config/agentbox/git-identity"
-printf '[user]\n\temail = personal@example.com\n' > "$HOME/.config/agentbox/git-identity-personal"
 mkdir -p "$HOME/xdev/identity-test" "$HOME/xdev/personal/identity-test"
 git -C "$HOME/xdev/identity-test" init -q
 git -C "$HOME/xdev/personal/identity-test" init -q
