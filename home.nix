@@ -265,6 +265,7 @@ in
   # edited without a home-manager switch (lazy.nvim manages the plugins).
   xdg.configFile."nvim".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/xdev/personal/agent-dotfiles/nvim";
+  xdg.configFile."herdr/config.toml".source = ./files/herdr-config.toml;
 
   # prompt: starship configured like the pure zsh prompt on my mac
   # (blue path, dimmed git branch + * when dirty, ≡ for stashes, yellow
