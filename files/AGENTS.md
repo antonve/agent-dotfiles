@@ -35,7 +35,11 @@ cd "$WT"                      # do all work here
   `herdr tab rename "$HERDR_TAB_ID" "<ISSUE-ID>-<short-topic>"`. Use the exact
   uppercase issue identifier followed by one to three lowercase title keywords
   in kebab-case. Keep the label short, rename it again when switching the tab to
-  a different issue, and never rename another tab.
+  a different issue, and never rename another tab. Never apply this to mate
+  tabs: a session with `PI_FIRST_MATE_ROLE=second-mate` must keep its tab
+  exactly `secondmate`, and the first-mate session must keep its tab exactly
+  `firstmate`. Linear identifiers still belong in linked task workspace names,
+  not mate tab labels.
 - Installed harnesses: `claude`, `codex`, `opencode`, `pi`.
 - `agentbox-update` refreshes all agent CLIs and their skills.
 - `add-ssh-key "<public key>"` grants SSH access for a new key.
