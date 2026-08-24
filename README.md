@@ -85,12 +85,24 @@ copy `files/box.env.example`).
 |---|---|
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
 | `agentbox-update` | refresh all agent CLIs, the local `pi-agent` checkout, axi tools and skills |
+| `agentbox-disk-reclaim` | reclaim safe disposable data when `/` is above 80% usage |
 | `pi-agent-update` | fast-forward `~/xdev/personal/pi-agent` to the latest `origin/main` immediately |
 | `pi-theme [github-dark-default\|gruvbox-dark]` | select this computer's Pi theme and update current settings; existing sessions need `/reload` |
 | `home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
 | `nix flake update` (then switch) | bump nixpkgs/herdr/treehouse pins |
 | `systemctl --user status pi-herdr-janitor.timer` | inspect durable Herdr/Treehouse cleanup |
 | `journalctl --user -u pi-herdr-janitor.service` | inspect orphan/dirty-lease cleanup diagnostics |
+| `systemctl --user status agentbox-disk-reclaim.timer` | inspect the hourly disk-usage check |
+| `journalctl --user -u agentbox-disk-reclaim.service` | inspect disk cleanup decisions and results |
+
+The hourly disk guard does nothing while the root filesystem is at or below
+80% usage. Above that threshold it first prunes only unreferenced Docker build
+cache and images, dangling package cache entries, unreachable Nix store paths,
+and Treehouse worktrees that are clean, merged, idle, and unleased. If usage
+remains above 80%, it clears rebuildable npm, uv, Bun, and Go caches. It never
+removes Docker containers or volumes, project files, reachable Nix paths, or
+active, dirty, unmerged, or leased Treehouse worktrees. Cleanup runs with idle
+I/O priority and continues past unavailable tools or individual failures.
 
 Git identity lives in untracked files: edit
 `~/.config/agentbox/git-identity` (default, work) and
