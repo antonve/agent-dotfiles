@@ -91,6 +91,9 @@ cd "$WT"                      # do all work here
 
 ## Etiquette
 
+- Do not mention or tag people, request reviews, assign work, or take any other
+  action that is likely to notify someone or solicit human attention unless the
+  user explicitly authorizes that specific action.
 - GitHub writes are allowed only in repositories owned by the account currently
   authenticated in `gh` or an owner listed in the installation-local
   `~/.config/agentbox/github-write-owners` allowlist. Never add owners to that
@@ -98,6 +101,11 @@ cd "$WT"                      # do all work here
   mutations elsewhere unless the user explicitly requests the policy change.
   Never bypass the guard with raw HTTP/API calls, alternate binaries,
   `--no-verify`, disabled hooks, or direct credentials.
+- Bypassing repository rules when merging is allowed, including when AI reviews
+  make it necessary, but only after every CI check on the PR is green. Never
+  enable auto-merge; it is incompatible with bypass merges.
+- For a bypass merge, run `npx -y gh-axi pr checks <PR>` and confirm every check
+  passes, then run `npx -y gh-axi pr merge <PR> --merge --admin`.
 - Prefix every agent-authored GitHub comment, review, or reply with a bold
   `**Reply by <model name>**` header, using the active model's name.
 - When the user asks to handle review comments, ignore automated review-bot
