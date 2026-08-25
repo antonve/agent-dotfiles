@@ -105,11 +105,19 @@ cd "$WT"                      # do all work here
   mutations elsewhere unless the user explicitly requests the policy change.
   Never bypass the guard with raw HTTP/API calls, alternate binaries,
   `--no-verify`, disabled hooks, or direct credentials.
-- Bypassing repository rules when merging is allowed, including when AI reviews
-  make it necessary, but only after every CI check on the PR is green. Never
-  enable auto-merge; it is incompatible with bypass merges.
-- For a bypass merge, run `npx -y gh-axi pr checks <PR>` and confirm every check
-  passes, then run `npx -y gh-axi pr merge <PR> --merge --admin`.
+- Bypass repository rules only with explicit user authorization for that merge.
+  Never enable auto-merge or bypass with failing configured checks.
+- For an authorized bypass merge, run
+  `npx -y gh-axi pr checks <PR> --repo=<owner/repo>` and require every configured
+  check to be green. Inspect the PR's full head SHA and the repository's allowed
+  merge methods, then attempt the focused admin path with an allowed method, for
+  example: `npx -y gh-axi pr merge <PR> --repo=<owner/repo> --squash --admin`.
+  If focused tooling cannot bypass the rule, use the permitted authenticated
+  fallback with the exact full head SHA and an allowed method, for example:
+  `npx -y gh-axi api PUT /repos/<owner>/<repo>/pulls/<PR>/merge --field sha=<FULL_HEAD_SHA> --field merge_method=squash`.
+  Never use a stale head SHA, raw `gh`, `curl`, or direct credentials. If the head
+  changes, repeat checks and inspection. Verify the merged result and resulting
+  SHA before reporting success.
 - Prefix every agent-authored GitHub comment, review, or reply with a bold
   `**Reply by <model name>**` header, using the active model's name.
 - When the user asks to handle review comments, ignore automated review-bot
