@@ -1,3 +1,26 @@
+[keys]
+prefix = "ctrl+s"
+
+[[keys.command]]
+key = "prefix+f"
+type = "shell"
+command = '''
+set -eu
+snapshot="$("$HERDR_BIN_PATH" api snapshot 2>/dev/null)" || exit 0
+pane_id="$(
+  printf '%s\n' "$snapshot" | jq -er '
+    .result.snapshot as $session
+    | [$session.workspaces[] | select(.label == "firstmate")] as $workspaces
+    | select($workspaces | length == 1)
+    | $workspaces[0].workspace_id as $workspace_id
+    | [$session.agents[] | select(.workspace_id == $workspace_id and .agent == "pi")] as $agents
+    | select($agents | length == 1)
+    | $agents[0].pane_id
+  ' 2>/dev/null
+)" || exit 0
+"$HERDR_BIN_PATH" agent focus "$pane_id" >/dev/null 2>&1 || true
+'''
+
 [ui.sidebar.spaces]
 rows = [
   ["state_icon", "workspace"],
