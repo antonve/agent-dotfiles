@@ -7,7 +7,7 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    herdr.url = "github:ogulcancelik/herdr";
+    herdr.url = "github:ogulcancelik/herdr/v0.8.2";
     treehouse.url = "github:kunchenguid/treehouse";
   };
 
