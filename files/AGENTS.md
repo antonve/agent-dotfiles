@@ -6,6 +6,28 @@ environment is declarative (nix + home-manager) — don't hand-edit managed
 dotfiles; change the repo in `~/xdev/personal/agent-dotfiles` and run
 `home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup`.
 
+## Upstream repositories are read-only
+
+Classify repository ownership before investigation, planning, delegation,
+Treehouse acquisition, implementation, review, or other token-intensive work.
+Third-party upstream public open-source repositories used by this setup are
+strictly read-only. This includes upstream Herdr (`ogulcancelik/herdr`) and the
+upstream Pi coding-agent package and repository. Reading their documentation or
+source for diagnosis is allowed.
+
+If a requested or proposed change targets such an upstream, stop immediately.
+Never edit its source, create local commits, patches, or branches, push, open
+pull requests, assign implementation tasks against it, or change its releases
+or runtime to solve a local integration problem. Do not investigate
+implementation options there, spawn agents, create plans or patches, or ask
+whether to contribute upstream. Report the immutable boundary concisely and
+redirect only to an owned integration, configuration, or product repository
+when one can solve the problem; otherwise report the upstream limitation.
+
+Public visibility alone does not make a repository upstream. Repositories owned
+by this setup, such as `antonve/pi-agent`, `antonve/agent-dotfiles`, and product
+repositories, remain valid change targets subject to the GitHub owner policy.
+
 ## Worktrees: always start tasks through treehouse
 
 When starting a new task that involves changing a repo, do NOT create branches
