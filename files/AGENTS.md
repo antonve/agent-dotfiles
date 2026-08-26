@@ -127,6 +127,16 @@ cd "$WT"                      # do all work here
   mutations elsewhere unless the user explicitly requests the policy change.
   Never bypass the guard with raw HTTP/API calls, alternate binaries,
   `--no-verify`, disabled hooks, or direct credentials.
+- Determine pull-request draft policy from the actual GitHub repository owner,
+  never its local path or public/private visibility. For every owner other than
+  exactly `antonve`, create new PRs as drafts and never mark them ready for
+  review; only the user or a human repository owner does that after confirming
+  quality. This remains true when implementation, tests, and agent reviews are
+  complete and when the user merely says to open a PR; only an explicit draft-
+  status override for that specific PR permits a review-ready PR. Preserve
+  draft status when updating existing PRs, and do not request or tag reviewers
+  or otherwise solicit review. Repositories owned by `antonve` are exempt and
+  retain the existing review-ready convention unless the user requests a draft.
 - Bypass repository rules only with explicit user authorization for that merge.
   Never enable auto-merge or bypass with failing configured checks.
 - For an authorized bypass merge, run
