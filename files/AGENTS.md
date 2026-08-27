@@ -127,6 +127,10 @@ cd "$WT"                      # do all work here
   mutations elsewhere unless the user explicitly requests the policy change.
   Never bypass the guard with raw HTTP/API calls, alternate binaries,
   `--no-verify`, disabled hooks, or direct credentials.
+- In every user-facing status update, progress report, completion report,
+  summary, handoff, or similar message, include a directly usable full URL for
+  each referenced pull request, even when its number or title is also present;
+  never leave a PR reference vague or unlinked.
 - Determine pull-request draft policy from the actual GitHub repository owner,
   never its local path or public/private visibility. For every owner other than
   exactly `antonve`, create new PRs as drafts and never mark them ready for
