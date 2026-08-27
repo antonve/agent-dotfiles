@@ -102,6 +102,24 @@ cd "$WT"                      # do all work here
   state their purpose and get agreement before implementing them. Prefer small,
   reviewable increments; large batches of code are difficult to verify reliably.
 
+## Reuse-first design
+
+- Before designing or implementing, find the closest existing implementation in
+  the same repository or project and in any relevant owned sibling project that
+  project documentation points to. Treat established structure, naming,
+  workflow, testing approach, and operational model as the default constraint;
+  explicit instructions to follow an existing pattern are mandatory.
+- Prefer copying or minimally adapting that implementation, changing only the
+  inputs or behavior the task requires. Never invent a new abstraction, CI flow,
+  test harness, safety mechanism, architecture, or parallel convention merely
+  because it seems cleaner or more robust.
+- If a material deviation appears necessary, stop before implementation. Present
+  the existing pattern, proposed difference, concrete reason direct reuse cannot
+  work, maintenance cost and tradeoffs, and smallest alternatives, then obtain
+  explicit user approval.
+- If no applicable pattern exists, say so and discuss the design before
+  implementation rather than silently treating the task as greenfield.
+
 ## Planning
 
 - Treat planning as an interactive design process, not a one-shot document.
