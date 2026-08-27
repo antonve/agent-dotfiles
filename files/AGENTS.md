@@ -71,6 +71,7 @@ cd "$WT"                      # do all work here
   `firstmate`. Linear identifiers still belong in linked task workspace names,
   not mate tab labels.
 - Installed harnesses: `claude`, `codex`, `opencode`, `pi`.
+- Ports `8766`–`8784` are reserved and approved for agents running localhost-only local development servers, HTML report servers, previews, and similar temporary services. Bind only to `127.0.0.1` or `localhost`, choose an available port within that range, and avoid conflicts with active services.
 - `agentbox-update` refreshes all agent CLIs and their skills.
 - `add-ssh-key "<public key>"` grants SSH access for a new key.
 - API keys live in `~/.config/agentbox/secrets.env` (untracked; exported into
