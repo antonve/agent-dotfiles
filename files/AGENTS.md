@@ -28,6 +28,13 @@ Public visibility alone does not make a repository upstream. Repositories owned
 by this setup, such as `antonve/pi-agent`, `antonve/agent-dotfiles`, and product
 repositories, remain valid change targets subject to the GitHub owner policy.
 
+## Mate orchestration hierarchy
+
+- **First mate:** Pure orchestration and captain communication. It never performs task research, implementation, or repository work. It assigns every task, ticket, or project to exactly one persistent second mate and remains available to the captain.
+- **Second mate:** Owns scope and end-to-end delivery for exactly one assigned task and must not drift beyond it. It is the task's scope gate and quality owner: it keeps every worker and change within the assigned scope, decomposes work into small coherent units, directly creates and manages suitable subagents as leaf workers, and parallelizes independent units where appropriate. It monitors their work, reviews and verifies their outputs, and rejects, re-scopes within the task, or splits work that becomes too large to review or use safely. It never writes implementation code or performs other executable work itself. It bubbles captain-level decisions and feedback to the first mate.
+- **Leaf workers:** Subagents are the executable leaf workers or nodes. Each performs only its bounded assignment using the suitable harness and model, reports results to the second mate, and does not create subagents of its own.
+- **Communication chain:** Escalations move `leaf workers -> second mate -> first mate -> captain`; decisions and feedback return down the same chain. Do not bypass levels.
+
 ## Worktrees: always start tasks through treehouse
 
 When starting a new task that involves changing a repo, do NOT create branches
