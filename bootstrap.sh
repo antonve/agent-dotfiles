@@ -21,8 +21,11 @@ log() { printf '\n\033[1;32m==> %s\033[0m\n' "$*"; }
 if command -v apt-get >/dev/null; then
   log "installing base apt packages"
   sudo apt-get update -qq
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
-    git curl ca-certificates xz-utils locales-all
+  apt_packages=(git curl ca-certificates xz-utils locales-all)
+  if [ -d /run/systemd/system ]; then
+    apt_packages+=(docker.io)
+  fi
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "${apt_packages[@]}"
 fi
 
 # --- nix ---------------------------------------------------------------------
@@ -104,6 +107,28 @@ ARCH="$(uname -m)" # x86_64 | aarch64
 log "activating home-manager configuration (agent-${ARCH}-linux)"
 nix run "$REPO_DIR#home-manager" -- switch \
   --flake "$REPO_DIR#agent-${ARCH}-linux" -b backup --impure
+
+# --- Draft standalone (Docker + boot/daily system units) --------------------
+if [ -d /run/systemd/system ]; then
+  log "installing boot-persistent Draft standalone service"
+  sudo systemctl enable --now docker.service
+  sudo usermod -aG docker "$USER"
+  for unit in draft-standalone.service draft-standalone-update.service; do
+    sed \
+      -e "s|@USER@|$USER|g" \
+      -e "s|@HOME@|$HOME|g" \
+      "$REPO_DIR/files/draft-standalone/${unit}.in" \
+      | sudo tee "/etc/systemd/system/$unit" >/dev/null
+  done
+  sudo install -m 0644 \
+    "$REPO_DIR/files/draft-standalone/draft-standalone-update.timer" \
+    /etc/systemd/system/draft-standalone-update.timer
+  sudo systemctl daemon-reload
+  sudo systemctl enable --now draft-standalone.service
+  sudo systemctl enable --now draft-standalone-update.timer
+else
+  echo "no systemd detected — skipping Draft standalone service setup (container?)"
+fi
 
 # --- keep herdr alive independent of login sessions ---------------------------
 # Done before agentbox-update so a flaky CLI install can't leave the box

@@ -38,6 +38,10 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   rebase pulls, `push.autoSetupRemote`) and the dev-box-relevant subset of my
   zsh aliases, ported to bash (`g`, `x`, `l`/`la`, `tf`, `gcm`, …).
 - **neovim** with `vim`/`vi` aliases, as `$EDITOR`.
+- **Draft standalone** as a boot-persistent Docker Compose application, with
+  daily backup-first image updates and its CLI installed at `~/.local/bin/draft`.
+  It has no application authentication and both ports bind to loopback only;
+  the SSH helper forwards the web UI to `http://127.0.0.1:8765`.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`
   and `~/.pi/agent/AGENTS.md`. The vendored user-invoked `bro` skill is also
@@ -67,7 +71,7 @@ Device-code login is disabled, and both `codex login` and
 port forwarded instead:
 
 ```sh
-./gcloud-ssh-box.sh    # gcloud compute ssh (IAP tunnel) + -L 1455:localhost:1455
+./gcloud-ssh-box.sh    # IAP SSH + OAuth and Draft localhost forwards
 ```
 
 The script labels the terminal tab `REMOTE - agent box` for the duration of
@@ -86,6 +90,10 @@ copy `files/box.env.example`).
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
 | `agentbox-update` | refresh all agent CLIs, the local `pi-agent` checkout, axi tools and skills |
 | `agentbox-disk-reclaim` | reclaim safe disposable data when `/` is above 80% usage |
+| `draft-standalone status` | show the Draft Compose services and health |
+| `draft-standalone update` | pull a matching API/web pair, back up PostgreSQL, migrate, and restart |
+| `draft-standalone backup` | create a retained PostgreSQL dump without updating |
+| `draft-standalone logs [service]` | follow Draft Compose logs |
 | `pi-agent-update` | fast-forward `~/xdev/personal/pi-agent` to the latest `origin/main` immediately |
 | `pi-theme [github-dark-default\|gruvbox-dark]` | select this computer's Pi theme and update current settings; existing sessions need `/reload` |
 | `home-manager switch --flake ~/xdev/personal/agent-dotfiles#agent-$(uname -m)-linux --impure -b backup` | apply config changes |
@@ -94,6 +102,13 @@ copy `files/box.env.example`).
 | `journalctl --user -u pi-herdr-janitor.service` | inspect orphan/dirty-lease cleanup diagnostics |
 | `systemctl --user status agentbox-disk-reclaim.timer` | inspect the hourly disk-usage check |
 | `journalctl --user -u agentbox-disk-reclaim.service` | inspect disk cleanup decisions and results |
+| `systemctl status draft-standalone.service` | inspect the boot-persistent Draft stack |
+| `systemctl status draft-standalone-update.timer` | inspect the persistent daily update timer |
+
+Draft keeps PostgreSQL in a named Docker volume and stores 14 days of database
+dumps under `~/.local/state/draft-standalone/backups`. The updater refuses to
+deploy when the public API and web image revision labels disagree. It never
+automatically rolls back a database migration.
 
 The hourly disk guard does nothing while the root filesystem is at or below
 80% usage. Above that threshold it first prunes only unreferenced Docker build

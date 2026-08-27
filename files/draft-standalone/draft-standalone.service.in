@@ -1,0 +1,19 @@
+[Unit]
+Description=Draft standalone application
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=@USER@
+SupplementaryGroups=docker
+Environment=HOME=@HOME@
+ExecStart=@HOME@/.local/bin/draft-standalone up
+ExecStop=@HOME@/.local/bin/draft-standalone down
+TimeoutStartSec=15min
+TimeoutStopSec=2min
+
+[Install]
+WantedBy=multi-user.target

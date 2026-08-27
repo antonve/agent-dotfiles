@@ -19,7 +19,8 @@ check() { # check <description> <command...>
 }
 
 for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
-           add-ssh-key agentbox-update agentbox-disk-reclaim pi-agent-update claude codex opencode pi \
+           add-ssh-key agentbox-update agentbox-disk-reclaim draft-standalone pi-agent-update claude codex opencode pi \
+           docker \
            gh-axi aws-axi quota-axi \
            gopls typescript-language-server terraform-ls lua-language-server nil gcc; do
   check "command available: $cmd" command -v "$cmd"
@@ -68,6 +69,32 @@ check "disk reclaim timer is hourly" grep -q 'OnCalendar=hourly' \
   "$HOME/.config/systemd/user/agentbox-disk-reclaim.timer"
 check "disk reclaim timer is persistent" grep -q 'Persistent=true' \
   "$HOME/.config/systemd/user/agentbox-disk-reclaim.timer"
+check "Docker Compose CLI plugin available" docker compose version
+check "Draft Compose file installed" test -f "$HOME/.config/draft-standalone/compose.yaml"
+check "Draft Compose contract is valid" docker compose \
+  --file "$HOME/.config/draft-standalone/compose.yaml" config --quiet
+check "Draft web binds only loopback port 8765" grep -q '127.0.0.1:8765:3000' \
+  "$HOME/.config/draft-standalone/compose.yaml"
+check "Draft API binds only loopback port 8764" grep -q '127.0.0.1:8764:8080' \
+  "$HOME/.config/draft-standalone/compose.yaml"
+check "Draft standalone disables application auth" grep -q 'DRAFT_AUTH_MODE: none' \
+  "$HOME/.config/draft-standalone/compose.yaml"
+check "Draft CLI uses standalone no-auth mode" sh -c \
+  '[ "$(bash -ic "echo \$DRAFT_AUTH_MODE" 2>/dev/null | tail -1)" = none ]'
+check "Draft CLI uses loopback API" sh -c \
+  '[ "$(bash -ic "echo \$DRAFT_API_URL" 2>/dev/null | tail -1)" = http://127.0.0.1:8764/api/v1 ]'
+check "Draft database password created" test -s \
+  "$HOME/.config/draft-standalone/secrets/postgres-password"
+check "Draft secret directory is private" sh -c \
+  '[ "$(stat -c %a "$HOME/.config/draft-standalone/secrets")" = 700 ]'
+check "Draft service template is boot-persistent" grep -q 'WantedBy=multi-user.target' \
+  "$HOME/xdev/personal/agent-dotfiles/files/draft-standalone/draft-standalone.service.in"
+check "Draft update timer is daily" grep -q 'OnCalendar=\*-\*-\* 04:00:00' \
+  "$HOME/xdev/personal/agent-dotfiles/files/draft-standalone/draft-standalone-update.timer"
+check "Draft update timer catches missed runs" grep -q 'Persistent=true' \
+  "$HOME/xdev/personal/agent-dotfiles/files/draft-standalone/draft-standalone-update.timer"
+check "SSH helper forwards Draft web port" grep -q -- '-L 8765:localhost:8765' \
+  "$HOME/xdev/personal/agent-dotfiles/gcloud-ssh-box.sh"
 check "Pi theme preference created" test -f "$HOME/.config/agentbox/pi-theme"
 check "Pi theme preference applied" sh -c '
   selected=$(grep -Ev "^[[:space:]]*(#|$)" "$HOME/.config/agentbox/pi-theme" | head -n 1)
@@ -96,6 +123,10 @@ check "herdr skill installed for claude" sh -c 'ls "$HOME"/.claude/skills/*herdr
 check "gh-axi skill installed (universal)" test -f "$HOME/.agents/skills/gh-axi/SKILL.md"
 for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills .pi/agent/skills; do
   check "bro skill installed: ~/$root" test -f "$HOME/$root/bro/SKILL.md"
+done
+for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills; do
+  check "Draft skill installed: ~/$root" test -f \
+    "$HOME/$root/draft-review-workflow/SKILL.md"
 done
 check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/settings.json"'
 check "claude commit attribution disabled" sh -c \
