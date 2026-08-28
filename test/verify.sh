@@ -26,7 +26,6 @@ for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
   check "command available: $cmd" command -v "$cmd"
 done
 
-check "aws-axi is NOT installed" sh -c '! command -v aws-axi'
 check "lavish-axi is NOT installed" sh -c '! command -v lavish-axi'
 
 check "vim is neovim" sh -c 'vim --version | head -1 | grep -qi nvim'
@@ -43,8 +42,6 @@ check "AGENTS.md protects first-mate tab labels" grep -q 'first-mate session mus
 check "AGENTS.md requires GitHub model reply headers" grep -q 'Reply by <model name>' "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md restricts GitHub writes" grep -q 'github-write-owners' "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md requires GitHub review replies" grep -q 'reply on GitHub to every relevant review' "$HOME/.claude/CLAUDE.md"
-check "AGENTS.md requires explicit AWS profile and region" grep -q \
-  -- '--profile <name>.*--region <region>' "$HOME/.claude/CLAUDE.md"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
 echo "==> installing nvim plugins headlessly (lazy.nvim + treesitter)"
@@ -125,10 +122,6 @@ check "herdr auto-attach has file opt-out" grep -q '.no-herdr' "$HOME/.bashrc"
 check "herdr skill installed for claude" sh -c 'ls "$HOME"/.claude/skills/*herdr*/SKILL.md 2>/dev/null | grep -q .'
 check "gh-axi skill installed (universal)" test -f "$HOME/.agents/skills/gh-axi/SKILL.md"
 for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills .pi/agent/skills; do
-  check "aws-axi skill absent: ~/$root" sh -c \
-    '[ ! -e "$HOME/$1/aws-axi" ] && [ ! -L "$HOME/$1/aws-axi" ]' sh "$root"
-done
-for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills .pi/agent/skills; do
   check "bro skill installed: ~/$root" test -f "$HOME/$root/bro/SKILL.md"
 done
 for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills; do
@@ -136,10 +129,6 @@ for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills;
     "$HOME/$root/draft-review-workflow/SKILL.md"
 done
 check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/settings.json"'
-check "aws-axi Claude hook absent" sh -c '! grep -q aws-axi "$HOME/.claude/settings.json"'
-check "aws-axi Codex hook absent" sh -c '! grep -q aws-axi "$HOME/.codex/hooks.json"'
-check "aws-axi OpenCode plugin absent" test ! -e \
-  "$HOME/.config/opencode/plugins/axi-aws-axi.js"
 check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
 check "AGENTS.md requires human-focused PR descriptions" grep -q 'concise decision aids for human reviewers' "$HOME/.claude/CLAUDE.md"

@@ -29,7 +29,7 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   harnesses so agents can talk across panes.
 - **treehouse** (from its nix flake) for pooled git worktrees; the global
   AGENTS.md tells agents to start every task through it.
-- **axi tools**: `gh-axi` and `quota-axi` with their skills, plus `gh-axi`
+- **axi tools**: `gh-axi` and `quota-axi` with their skills and `gh-axi`
   SessionStart hooks (deliberately no lavish-axi).
 - **Dev tooling** from nixpkgs: git, gh, aws, gcloud, node, terraform, rg, fd,
   jq, fzf, make, htop, and a common Go toolset (`gopls`, `golangci-lint`,

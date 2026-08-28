@@ -90,8 +90,7 @@ cd "$WT"                      # do all work here
   a `command not found` failure.
 - Prefer `gh-axi` for GitHub operations and `quota-axi` for agent-provider
   quota; they are token-efficient and suggest next steps.
-- For AWS operations, use the standard `aws` CLI and require an explicit
-  `--profile <name>` and `--region <region>` on every command.
+- Use the standard `aws` CLI for AWS operations.
 
 ## Scope discipline
 

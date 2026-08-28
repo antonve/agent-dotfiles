@@ -97,44 +97,6 @@ let
     gh-axi setup hooks || echo "warning: gh-axi hook setup failed"
     # quota-axi has no session hooks; its skill runs it on demand via npx
 
-    echo "==> removing retired aws-axi integration"
-    npm uninstall --global aws-axi
-    timeout 300 npx --yes skills remove aws-axi -g -y < /dev/null
-    for settings in "$HOME/.claude/settings.json" "$HOME/.codex/hooks.json"; do
-      if [ ! -f "$settings" ]; then
-        continue
-      fi
-      ${pkgs.jq}/bin/jq '
-        if (.hooks? | type) == "object" then
-          .hooks |= (
-            if (.SessionStart? | type) == "array" then
-              .SessionStart |= (
-                map(
-                  if (.hooks? | type) == "array" then
-                    .hooks |= map(select(
-                      (((.command? | type) == "string") and (.command | contains("aws-axi"))) | not
-                    ))
-                  else . end
-                )
-                | map(select(((.hooks? | type) != "array") or ((.hooks | length) > 0)))
-              )
-            else . end
-            | if (.session_start? | type) == "array" then
-                .session_start |= map(select(
-                  (((.command? | type) == "string") and (.command | contains("aws-axi"))) | not
-                ))
-              else . end
-          )
-        else . end
-      ' "$settings" > "$settings.tmp"
-      mv "$settings.tmp" "$settings"
-    done
-    aws_axi_opencode_plugin="$HOME/.config/opencode/plugins/axi-aws-axi.js"
-    if [ -f "$aws_axi_opencode_plugin" ] \
-      && grep -qF 'axi-sdk-js managed opencode plugin: aws-axi' "$aws_axi_opencode_plugin"; then
-      rm -f "$aws_axi_opencode_plugin"
-    fi
-
     # claude settings — merged (not written whole) because the gh-axi hooks also
     # edit this file. Sets: no session links / Co-Authored-By trailers in
     # commits; auto permission mode by default; and the trust-seeding
