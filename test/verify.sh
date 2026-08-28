@@ -21,7 +21,7 @@ check() { # check <description> <command...>
 for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
            add-ssh-key agentbox-update agentbox-disk-reclaim draft-standalone pi-agent-update claude codex opencode pi \
            docker \
-           gh-axi aws-axi quota-axi \
+           gh-axi quota-axi \
            gopls typescript-language-server terraform-ls lua-language-server nil gcc; do
   check "command available: $cmd" command -v "$cmd"
 done

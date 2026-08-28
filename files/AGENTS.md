@@ -88,9 +88,9 @@ cd "$WT"                      # do all work here
   assignment applies only to `command1`. Do this especially for Nix, Home
   Manager, and Go tooling; do not retry by guessing executable locations after
   a `command not found` failure.
-- Prefer the axi wrappers over the raw CLIs when they exist: `gh-axi` for
-  GitHub operations, `aws-axi` for AWS, `quota-axi` for agent-provider quota.
-  They are token-efficient and suggest next steps.
+- Prefer `gh-axi` for GitHub operations and `quota-axi` for agent-provider
+  quota; they are token-efficient and suggest next steps.
+- Use the standard `aws` CLI for AWS operations.
 
 ## Scope discipline
 

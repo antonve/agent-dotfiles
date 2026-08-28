@@ -90,16 +90,14 @@ let
     skill ogulcancelik/herdr herdr
 
     # agent-ergonomic CLI wrappers for the CLIs on this box — deliberately NOT lavish-axi
-    echo "==> axi tools (gh, aws, quota) + skills + session hooks"
-    npm install --global gh-axi@latest aws-axi@latest quota-axi@latest
+    echo "==> axi tools (gh, quota) + skills + session hooks"
+    npm install --global gh-axi@latest quota-axi@latest
     skill kunchenguid/gh-axi gh-axi
     skill kunchenguid/quota-axi quota-axi
-    skill bauti-defi/aws-axi aws-axi || echo "warning: aws-axi skill install failed (hooks still cover it)"
     gh-axi setup hooks || echo "warning: gh-axi hook setup failed"
-    aws-axi setup hooks || echo "warning: aws-axi hook setup failed"
     # quota-axi has no session hooks; its skill runs it on demand via npx
 
-    # claude settings — merged (not written whole) because the axi hooks also
+    # claude settings — merged (not written whole) because the gh-axi hooks also
     # edit this file. Sets: no session links / Co-Authored-By trailers in
     # commits; auto permission mode by default; and the trust-seeding
     # SessionStart hook. The hook entry is dropped-then-appended so repeated
@@ -191,7 +189,7 @@ in
     awscli2
     google-cloud-sdk
     nodejs_24
-    bun # aws-axi runs on bun
+    bun
     go
     delve
     gofumpt
