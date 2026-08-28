@@ -1,0 +1,13 @@
+[Unit]
+Description=Back up and update Draft standalone
+Wants=network-online.target
+After=network-online.target docker.service draft-standalone.service
+Requires=docker.service draft-standalone.service
+
+[Service]
+Type=oneshot
+User=@USER@
+SupplementaryGroups=docker
+Environment=HOME=@HOME@
+ExecStart=@HOME@/.local/bin/draft-standalone update
+TimeoutStartSec=30min

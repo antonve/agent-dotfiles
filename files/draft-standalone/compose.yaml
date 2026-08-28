@@ -1,0 +1,132 @@
+name: draft-standalone
+
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:742f40ea20b9ff2ff31db5458d127452988a2164df9e17441e191f3b72252193
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: draft
+      POSTGRES_USER: draft
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+    secrets:
+      - postgres-password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username=$${POSTGRES_USER} --dbname=$${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - draft
+
+  migrate:
+    image: ${DRAFT_API_IMAGE:-ghcr.io/antonve/draft-api:main}
+    command: ["migrate"]
+    restart: "no"
+    environment:
+      DRAFT_MIGRATION_DATABASE_HOST: postgres
+      DRAFT_MIGRATION_DATABASE_NAME: draft
+      DRAFT_MIGRATION_DATABASE_USER: draft
+      DRAFT_MIGRATION_DATABASE_PASSWORD_FILE: /run/secrets/postgres-password
+      DRAFT_MIGRATION_DATABASE_SSLMODE: disable
+    secrets:
+      - postgres-password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - draft
+
+  api:
+    image: ${DRAFT_API_IMAGE:-ghcr.io/antonve/draft-api:main}
+    restart: unless-stopped
+    init: true
+    environment:
+      DRAFT_DATABASE_HOST: postgres
+      DRAFT_DATABASE_NAME: draft
+      DRAFT_DATABASE_USER: draft
+      DRAFT_DATABASE_PASSWORD_FILE: /run/secrets/postgres-password
+      DRAFT_DATABASE_SSLMODE: disable
+      DRAFT_AUTH_MODE: none
+      DRAFT_STANDALONE_OWNER_SUBJECT: standalone-owner
+      DRAFT_STANDALONE_OWNER_NAME: Standalone Owner
+      DRAFT_PUBLIC_ORIGIN: http://127.0.0.1:8765
+      DRAFT_LISTEN_ADDRESS: :8080
+    secrets:
+      - postgres-password
+    ports:
+      - "127.0.0.1:8764:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "/app/draft-api", "healthcheck"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - draft
+
+  web:
+    image: ${DRAFT_WEB_IMAGE:-ghcr.io/antonve/draft-web:main}
+    restart: unless-stopped
+    init: true
+    environment:
+      DRAFT_API_URL: http://api.:8080/api/v1
+      DRAFT_AUTH_MODE: none
+      HOST: 0.0.0.0
+      PORT: 3000
+    ports:
+      - "127.0.0.1:8765:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - require('node:net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - draft
+
+volumes:
+  postgres-data:
+
+secrets:
+  postgres-password:
+    file: ./secrets/postgres-password
+
+networks:
+  draft:
+    internal: true

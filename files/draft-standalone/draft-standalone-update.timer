@@ -1,0 +1,12 @@
+[Unit]
+Description=Update Draft standalone daily
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+RandomizedDelaySec=30min
+AccuracySec=1min
+Unit=draft-standalone-update.service
+
+[Install]
+WantedBy=timers.target

@@ -43,6 +43,11 @@ let
     runtimeInputs = with pkgs; [ coreutils gawk util-linux ];
     text = builtins.readFile ./agentbox-disk-reclaim.sh;
   };
+  draftStandalone = pkgs.writeShellApplication {
+    name = "draft-standalone";
+    runtimeInputs = with pkgs; [ coreutils docker-client docker-compose findutils jq openssl util-linux ];
+    text = builtins.readFile ./draft-standalone.sh;
+  };
   piWrapper = pkgs.writeShellScriptBin "pi" ''
     pi_bin="$HOME/.npm-global/bin/pi"
     if [ ! -x "$pi_bin" ]; then
@@ -165,6 +170,8 @@ in
   # not Debian's; without this every shell warns "cannot change locale".
   home.sessionVariables.LOCALE_ARCHIVE =
     "${pkgs.glibcLocalesUtf8}/lib/locale/locale-archive";
+  home.sessionVariables.DRAFT_AUTH_MODE = "none";
+  home.sessionVariables.DRAFT_API_URL = "http://127.0.0.1:8764/api/v1";
 
   home.packages = with pkgs; [
     herdrPkg
@@ -174,6 +181,7 @@ in
     piTheme
     piWrapper
     agentboxDiskReclaim
+    draftStandalone
     addSshKey
     claudeTrustSeed
     githubGuard
@@ -266,6 +274,7 @@ in
   xdg.configFile."nvim".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/xdev/personal/agent-dotfiles/nvim";
   xdg.configFile."herdr/config.toml".source = ./files/herdr-config.toml;
+  xdg.configFile."draft-standalone/compose.yaml".source = ./files/draft-standalone/compose.yaml;
 
   # prompt: starship configured like the pure zsh prompt on my mac
   # (blue path, dimmed git branch + * when dirty, ≡ for stashes, yellow
@@ -436,6 +445,20 @@ in
   home.file.".config/opencode/skills/bro".source = ./files/skills/bro;
   home.file.".pi/agent/skills/bro".source = ./files/skills/bro;
 
+  # Draft's workflow ships with the mutable Pi package and is linked into the
+  # other harnesses from that one checkout.
+  home.file.".agents/skills/draft-review-workflow".source =
+    config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/skills/draft-review-workflow";
+  home.file.".claude/skills/draft-review-workflow".source =
+    config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/skills/draft-review-workflow";
+  home.file.".codex/skills/draft-review-workflow".source =
+    config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/skills/draft-review-workflow";
+  home.file.".config/opencode/skills/draft-review-workflow".source =
+    config.lib.file.mkOutOfStoreSymlink "${piAgentDir}/skills/draft-review-workflow";
+
+  home.file.".docker/cli-plugins/docker-compose".source =
+    "${pkgs.docker-compose}/bin/docker-compose";
+
   # Pi loads the mutable personal checkout directly. Every activation updates
   # it to origin/main before settings are rewritten; agentbox-update does the
   # same independently of Home Manager. Herdr's generated extension directory
@@ -482,6 +505,10 @@ in
     rm -f "$current"
   '';
 
+  home.activation.draftStandalone = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ${draftStandalone}/bin/draft-standalone init
+  '';
+
   # herdr server as a user service. Combined with `loginctl enable-linger`
   # (done in bootstrap.sh) it starts at boot and survives SSH disconnects and
   # logouts — it is not tied to any login session.
@@ -501,6 +528,8 @@ in
       # Panes inherit this environment; include everything agents need.
       Environment = [
         "PATH=%h/.npm-global/bin:%h/.local/bin:%h/go/bin:%h/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin"
+        "DRAFT_AUTH_MODE=none"
+        "DRAFT_API_URL=http://127.0.0.1:8764/api/v1"
       ];
     };
     Install = {
