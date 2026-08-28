@@ -234,6 +234,7 @@ in
     enable = true;
     package = gitGuard;
     lfs.enable = true;
+    ignores = [ "treehouse.toml" ];
     settings = {
       init.defaultBranch = "main";
       pull.rebase = true;
