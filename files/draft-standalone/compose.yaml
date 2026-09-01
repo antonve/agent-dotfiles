@@ -129,4 +129,3 @@ secrets:
 
 networks:
   draft:
-    internal: true
