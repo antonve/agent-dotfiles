@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # SSH to the agent box via GCP (gcloud compute ssh over an IAP tunnel) with
-# the OAuth callback and Draft web ports forwarded. Codex and OpenCode both
-# listen on localhost:1455; Draft listens on localhost:8765.
+# the OAuth callback, Draft web, and T3 Code ports forwarded. Codex and
+# OpenCode listen on localhost:1455; Draft on 8765; T3 Code on 8784.
 #
 # Usage: ./gcloud-ssh-box.sh
 #   then inside the box:  codex login  (or  opencode auth login)
-#   open the printed OAuth URL, or browse to http://127.0.0.1:8765 for Draft.
+#   open the printed OAuth URL, browse to http://127.0.0.1:8765 for Draft,
+#   or browse to http://127.0.0.1:8784 for T3 Code.
 #
 # Box coordinates deliberately live outside the repo: copy
 # files/box.env.example to ~/.config/agentbox/box.env on the machine you
@@ -42,4 +43,5 @@ gcloud compute ssh "$AGENTBOX_VM" \
   -- \
   -L 1455:localhost:1455 \
   -L 8765:localhost:8765 \
+  -L 8784:localhost:8784 \
   "$@"

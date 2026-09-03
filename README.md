@@ -42,6 +42,9 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   daily backup-first image updates and its CLI installed at `~/.local/bin/draft`.
   It has no application authentication and both ports bind to loopback only;
   the SSH helper forwards the web UI to `http://127.0.0.1:8765`.
+- **T3 Code 0.0.38** as a boot-persistent systemd user service. It reuses the
+  installed provider CLI authentication, binds only to loopback, and is
+  forwarded by the SSH helper to `http://127.0.0.1:8784`.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`
   and `~/.pi/agent/AGENTS.md`. The vendored user-invoked `bro` skill is also
@@ -63,7 +66,7 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   `systemctl --user restart herdr` (when no agents are mid-task) so the
   server picks up the new values.
 
-## Logging in to codex / opencode (browser OAuth)
+## Browser OAuth and T3 Code access
 
 Device-code login is disabled, and both `codex login` and
 `opencode auth login` receive their OAuth callback on `localhost:1455`
@@ -71,7 +74,7 @@ Device-code login is disabled, and both `codex login` and
 port forwarded instead:
 
 ```sh
-./gcloud-ssh-box.sh    # IAP SSH + OAuth and Draft localhost forwards
+./gcloud-ssh-box.sh    # IAP SSH + OAuth, Draft, and T3 Code localhost forwards
 ```
 
 The script labels the terminal tab `REMOTE - agent box` for the duration of
@@ -83,12 +86,21 @@ port). The box coordinates live in
 `~/.config/agentbox/box.env` on the machine you connect from (untracked;
 copy `files/box.env.example`).
 
+While the helper is connected, T3 Code is available locally at
+`http://127.0.0.1:8784`. For browser pairing, read the token directly on the
+box with `journalctl --user -u t3code.service` and enter it only into that
+local UI. Treat the pairing token as a secret: never copy it into chats,
+additional logs, or tracked files, and do not share it. To use a different
+port, set `T3CODE_PORT` in the untracked `~/.config/agentbox/secrets.env` and
+use a matching SSH forward.
+
 ## Day-2 commands
 
 | command | what it does |
 |---|---|
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
 | `agentbox-update` | refresh all agent CLIs, the local `pi-agent` checkout, axi tools and skills |
+| `systemctl --user status t3code.service` | inspect the persistent loopback-only T3 Code service |
 | `agentbox-disk-reclaim` | reclaim safe disposable data when `/` is above 80% usage |
 | `draft-standalone status` | show the Draft Compose services and health |
 | `draft-standalone update` | pull a matching API/web pair, back up PostgreSQL, migrate, and restart |

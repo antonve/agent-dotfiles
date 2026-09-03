@@ -19,7 +19,7 @@ check() { # check <description> <command...>
 }
 
 for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
-           add-ssh-key agentbox-update agentbox-disk-reclaim draft-standalone pi-agent-update claude codex opencode pi \
+           add-ssh-key agentbox-update agentbox-disk-reclaim draft-standalone pi-agent-update claude codex opencode pi t3 \
            docker \
            gh-axi quota-axi \
            gopls typescript-language-server terraform-ls lua-language-server nil gcc; do
@@ -61,6 +61,26 @@ check "nvim leader is comma" sh -c \
 check "herdr config present" test -f "$HOME/.config/herdr/config.toml"
 check "herdr workspace sidebar shows repo subtitle" grep -q '\$repo' "$HOME/.config/herdr/config.toml"
 check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.service"
+check "T3 Code version is pinned" sh -c '[ "$(t3 --version)" = "t3 v0.0.38" ]'
+check "T3 Code npm package is pinned" sh -c \
+  '[ "$(npm list --global --depth=0 --json | jq -r .dependencies.t3.version)" = 0.0.38 ]'
+check "T3 Code package comes from pingdotgg/t3code" sh -c \
+  '[ "$(node -p "require(process.env.HOME + '\''/.npm-global/lib/node_modules/t3/package.json'\'').repository.url")" = https://github.com/pingdotgg/t3code ]'
+check "T3 Code user service unit" test -f "$HOME/.config/systemd/user/t3code.service"
+check "T3 Code user service is enabled" test -L \
+  "$HOME/.config/systemd/user/default.target.wants/t3code.service"
+check "T3 Code binds only to loopback" grep -q -- '--host 127.0.0.1' \
+  "$HOME/.config/systemd/user/t3code.service"
+check "T3 Code has no public bind" sh -c \
+  '! grep -Eq -- "--host (0\\.0\\.0\\.0|::)" "$HOME/.config/systemd/user/t3code.service"'
+check "T3 Code uses the configurable port" grep -Fq -- '--port ${T3CODE_PORT}' \
+  "$HOME/.config/systemd/user/t3code.service"
+check "T3 Code defaults to port 8784" grep -q 'T3CODE_PORT=8784' \
+  "$HOME/.config/systemd/user/t3code.service"
+check "T3 Code does not open a browser" grep -q -- '--no-browser' \
+  "$HOME/.config/systemd/user/t3code.service"
+check "T3 Code service loads optional provider secrets" grep -q 'EnvironmentFile=-.*agentbox/secrets.env' \
+  "$HOME/.config/systemd/user/t3code.service"
 check "Pi Herdr janitor service unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.service"
 check "Pi Herdr janitor timer unit" test -f "$HOME/.config/systemd/user/pi-herdr-janitor.timer"
 check "disk reclaim service unit" test -f "$HOME/.config/systemd/user/agentbox-disk-reclaim.service"
@@ -94,6 +114,8 @@ check "Draft update timer is daily" grep -q 'OnCalendar=\*-\*-\* 04:00:00' \
 check "Draft update timer catches missed runs" grep -q 'Persistent=true' \
   "$HOME/xdev/personal/agent-dotfiles/files/draft-standalone/draft-standalone-update.timer"
 check "SSH helper forwards Draft web port" grep -q -- '-L 8765:localhost:8765' \
+  "$HOME/xdev/personal/agent-dotfiles/gcloud-ssh-box.sh"
+check "SSH helper forwards T3 Code port" grep -q -- '-L 8784:localhost:8784' \
   "$HOME/xdev/personal/agent-dotfiles/gcloud-ssh-box.sh"
 check "Pi theme preference created" test -f "$HOME/.config/agentbox/pi-theme"
 check "Pi theme preference applied" sh -c '
