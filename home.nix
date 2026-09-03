@@ -57,8 +57,8 @@ let
     exec "$pi_bin" "$@"
   '';
 
-  # Fast-moving agent CLIs are installed via their native installers / npm so
-  # they stay current and can self-update; nixpkgs lags them by weeks.
+  # Agent CLIs use their native installers / npm because nixpkgs lags them;
+  # T3 Code stays pinned to the reviewed version below.
   agentboxUpdate = pkgs.writeShellScriptBin "agentbox-update" ''
     set -euo pipefail
     export NPM_CONFIG_PREFIX="$HOME/.npm-global"
@@ -75,6 +75,9 @@ let
 
     echo "==> pi"
     npm install --global --ignore-scripts @earendil-works/pi-coding-agent@latest
+
+    echo "==> t3code"
+    npm install --global --no-audit --no-fund t3@0.0.38 < /dev/null
 
     ${piAgentUpdate}/bin/pi-agent-update
 
@@ -507,6 +510,30 @@ in
   home.activation.draftStandalone = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     ${draftStandalone}/bin/draft-standalone init
   '';
+
+  # Keep T3 Code on the reviewed version during both Home Manager activation
+  # and agentbox-update. It stays in the existing managed npm-global prefix.
+  home.activation.t3Code = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+    export PATH="${pkgs.nodejs_24}/bin:$HOME/.npm-global/bin:$PATH"
+    ${pkgs.nodejs_24}/bin/npm install --global --no-audit --no-fund t3@0.0.38 < /dev/null
+  '';
+
+  systemd.user.services.t3code = {
+    Unit.Description = "T3 Code web interface";
+    Service = {
+      ExecStart = "%h/.npm-global/bin/t3 serve --host 127.0.0.1 --port \${T3CODE_PORT} --no-browser";
+      Restart = "on-failure";
+      RestartSec = 2;
+      # Provider API keys and an optional T3CODE_PORT override.
+      EnvironmentFile = "-%h/.config/agentbox/secrets.env";
+      Environment = [
+        "PATH=${pkgs.nodejs_24}/bin:%h/.npm-global/bin:%h/.local/bin:%h/go/bin:%h/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin"
+        "T3CODE_PORT=8784"
+      ];
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
 
   # herdr server as a user service. Combined with `loginctl enable-linger`
   # (done in bootstrap.sh) it starts at boot and survives SSH disconnects and
