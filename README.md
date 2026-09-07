@@ -27,8 +27,7 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   login shell (`ssh box -- bash`) — plain `NO_HERDR=1 ssh` won't survive
   sshd's AcceptEnv filter. The herdr agent skill is installed for all
   harnesses so agents can talk across panes.
-- **treehouse** (from its nix flake) for pooled git worktrees; the global
-  AGENTS.md tells agents to start every task through it.
+- **treehouse** (from its nix flake) is available for pooled git worktrees.
 - **axi tools**: `gh-axi` and `quota-axi` with their skills and `gh-axi`
   SessionStart hooks (deliberately no lavish-axi).
 - **Dev tooling** from nixpkgs: git, gh, aws, gcloud, node, terraform, rg, fd,
@@ -45,9 +44,12 @@ agent CLIs, and wires herdr up as a boot-persistent service.
 - **T3 Code nightly** as a boot-persistent systemd user service. It reuses the
   installed provider CLI authentication, binds only to loopback, and is
   forwarded by the SSH helper to `http://127.0.0.1:8784`.
-- **Global agent instructions**: one `files/AGENTS.md` linked to
+- **Global agent instructions**: one minimal, harness-neutral `files/AGENTS.md`
+  with mandatory phased plans stored and reviewed in Draft, linked to
   `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`
-  and `~/.pi/agent/AGENTS.md`. The vendored user-invoked `bro` skill is also
+  and `~/.pi/agent/AGENTS.md`. Agents commit task changes and push to an existing
+  task PR; when none exists, they ask whether to open one and wait for instructions.
+  The vendored user-invoked `bro` skill is also
   available in every harness for restating the last response without jargon.
 - **Managed Pi package**: selectable GitHub Dark or Gruvbox Dark UI, `ask_user`, `/copy-all`, calm
   collapsed tool output, structured system `fd`/`rg`, Git/model dashboard

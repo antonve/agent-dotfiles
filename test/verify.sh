@@ -36,12 +36,7 @@ check "~/xdev exists" test -d "$HOME/xdev"
 for f in .claude/CLAUDE.md .codex/AGENTS.md .config/opencode/AGENTS.md .pi/agent/AGENTS.md; do
   check "agent instructions: ~/$f" test -s "$HOME/$f"
 done
-check "AGENTS.md mentions treehouse" grep -q treehouse "$HOME/.claude/CLAUDE.md"
-check "AGENTS.md protects second-mate tab labels" grep -q 'PI_FIRST_MATE_ROLE=second-mate' "$HOME/.claude/CLAUDE.md"
-check "AGENTS.md protects first-mate tab labels" grep -q 'first-mate session must keep its tab exactly' "$HOME/.claude/CLAUDE.md"
-check "AGENTS.md requires GitHub model reply headers" grep -q 'Reply by <model name>' "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md restricts GitHub writes" grep -q 'github-write-owners' "$HOME/.claude/CLAUDE.md"
-check "AGENTS.md requires GitHub review replies" grep -q 'reply on GitHub to every relevant review' "$HOME/.claude/CLAUDE.md"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
 echo "==> installing nvim plugins headlessly (lazy.nvim + treesitter)"
@@ -158,7 +153,6 @@ done
 check "gh-axi session hook registered" sh -c 'grep -rq gh-axi "$HOME/.claude/settings.json"'
 check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
-check "AGENTS.md requires human-focused PR descriptions" grep -q 'concise decision aids for human reviewers' "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md forbids AI trailers" grep -qi "Co-Authored-By" "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md forbids default commit amends and force pushes" grep -q 'Do not amend existing commits or force-push branches by default' "$HOME/.claude/CLAUDE.md"
 
