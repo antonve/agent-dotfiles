@@ -515,7 +515,11 @@ in
   # activation and agentbox-update. It stays in the managed npm-global prefix.
   home.activation.t3Code = lib.hm.dag.entryBetween [ "reloadSystemd" ] [ "writeBoundary" ] ''
     export NPM_CONFIG_PREFIX="$HOME/.npm-global"
-    export PATH="${pkgs.nodejs_24}/bin:$HOME/.npm-global/bin:$PATH"
+    export PYTHON="${pkgs.python3}/bin/python3"
+    export MAKE="${pkgs.gnumake}/bin/make"
+    export CC="${pkgs.stdenv.cc}/bin/cc"
+    export CXX="${pkgs.stdenv.cc}/bin/c++"
+    export PATH="${pkgs.nodejs_24}/bin:${pkgs.python3}/bin:${pkgs.gnumake}/bin:${pkgs.stdenv.cc}/bin:${pkgs.bash}/bin:${pkgs.coreutils}/bin:${pkgs.gnused}/bin:$HOME/.npm-global/bin"
     ${pkgs.nodejs_24}/bin/npm install --global --no-audit --no-fund ${t3CodeNpmPackage} < /dev/null
   '';
 
