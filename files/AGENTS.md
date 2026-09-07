@@ -43,7 +43,7 @@ see its README for setup and activation commands.
 
 ## GitHub and consequential actions
 
-- Commit task changes automatically and push them to the task’s existing PR.
+- Commit completed task changes automatically and push to that task’s existing PR.
   If no PR exists for the task, ask whether to open one and wait for the user’s
   instruction; do not create a PR automatically.
 - GitHub writes are allowed only for the authenticated account or owners in
