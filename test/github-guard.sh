@@ -31,6 +31,7 @@ expect_blocked() {
 }
 
 # Reads are unaffected.
+guard --version >/dev/null
 guard pr view 1 --repo upstream/project >/dev/null
 
 # Owned and explicitly allowlisted writes are allowed; others are blocked.

@@ -171,7 +171,7 @@ case "$command:$subcommand" in
   repo:fork|gist:create|gist:delete|gist:edit|gist:rename|gpg-key:add|gpg-key:delete|ssh-key:add|ssh-key:delete) login >/dev/null ;;
 
   # Explicitly read-only or local-only commands.
-  auth:*|alias:*|browse:*|completion:*|config:*|extension:*|help:*|search:*|status:*|version:*|pr:checks|pr:diff|pr:list|pr:status|pr:view|pr:checkout|issue:list|issue:status|issue:view|run:download|run:list|run:view|run:watch|workflow:list|workflow:view|release:download|release:list|release:verify|release:view|repo:clone|repo:list|repo:view|label:list|secret:list|variable:list|project:list|project:view|project:item-list|project:field-list|gist:clone|gist:list|gist:view|gpg-key:list|ssh-key:list) ;;
+  --version:*|auth:*|alias:*|browse:*|completion:*|config:*|extension:*|help:*|search:*|status:*|version:*|pr:checks|pr:diff|pr:list|pr:status|pr:view|pr:checkout|issue:list|issue:status|issue:view|run:download|run:list|run:view|run:watch|workflow:list|workflow:view|release:download|release:list|release:verify|release:view|repo:clone|repo:list|repo:view|label:list|secret:list|variable:list|project:list|project:view|project:item-list|project:field-list|gist:clone|gist:list|gist:view|gpg-key:list|ssh-key:list) ;;
   *) die "unclassified gh command '$command $subcommand'; refusing because it may mutate GitHub" ;;
 esac
 
