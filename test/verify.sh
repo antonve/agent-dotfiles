@@ -61,9 +61,14 @@ check "nvim leader is comma" sh -c \
 check "herdr config present" test -f "$HOME/.config/herdr/config.toml"
 check "herdr workspace sidebar shows repo subtitle" grep -q '\$repo' "$HOME/.config/herdr/config.toml"
 check "herdr user service unit" test -f "$HOME/.config/systemd/user/herdr.service"
-check "T3 Code version is pinned" sh -c '[ "$(t3 --version)" = "t3 v0.0.38" ]'
-check "T3 Code npm package is pinned" sh -c \
-  '[ "$(npm list --global --depth=0 --json | jq -r .dependencies.t3.version)" = 0.0.38 ]'
+check "T3 Code npm package is a nightly prerelease" sh -c '
+  version=$(node -p "require(process.env.HOME + '\''/.npm-global/lib/node_modules/t3/package.json'\'').version") &&
+  node -e "if (!/^\\d+\\.\\d+\\.\\d+-nightly\\.\\d{8}\\.\\d+$/.test(process.argv[1])) process.exit(1)" "$version"
+'
+check "T3 Code executable matches its npm package" sh -c '
+  version=$(npm list --global --depth=0 --json | jq -r .dependencies.t3.version) &&
+  [ "$(t3 --version)" = "t3 v$version" ]
+'
 check "T3 Code package comes from pingdotgg/t3code" sh -c \
   '[ "$(node -p "require(process.env.HOME + '\''/.npm-global/lib/node_modules/t3/package.json'\'').repository.url")" = https://github.com/pingdotgg/t3code ]'
 check "T3 Code user service unit" test -f "$HOME/.config/systemd/user/t3code.service"

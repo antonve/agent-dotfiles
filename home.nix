@@ -5,6 +5,7 @@ let
   treehousePkg = treehouse.packages.${pkgs.stdenv.hostPlatform.system}.default;
   agentsMd = ./files/AGENTS.md;
   piAgentDir = "${config.home.homeDirectory}/xdev/personal/pi-agent";
+  t3CodeNpmPackage = "t3@nightly";
   githubGuard = pkgs.writeShellApplication {
     name = "gh";
     runtimeInputs = with pkgs; [ coreutils ];
@@ -57,8 +58,7 @@ let
     exec "$pi_bin" "$@"
   '';
 
-  # Agent CLIs use their native installers / npm because nixpkgs lags them;
-  # T3 Code stays pinned to the reviewed version below.
+  # Agent CLIs use their native installers / npm because nixpkgs lags them.
   agentboxUpdate = pkgs.writeShellScriptBin "agentbox-update" ''
     set -euo pipefail
     export NPM_CONFIG_PREFIX="$HOME/.npm-global"
@@ -77,7 +77,7 @@ let
     npm install --global --ignore-scripts @earendil-works/pi-coding-agent@latest
 
     echo "==> t3code"
-    npm install --global --no-audit --no-fund t3@0.0.38 < /dev/null
+    npm install --global --no-audit --no-fund ${t3CodeNpmPackage} < /dev/null
 
     ${piAgentUpdate}/bin/pi-agent-update
 
@@ -511,12 +511,12 @@ in
     ${draftStandalone}/bin/draft-standalone init
   '';
 
-  # Keep T3 Code on the reviewed version during both Home Manager activation
-  # and agentbox-update. It stays in the existing managed npm-global prefix.
-  home.activation.t3Code = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  # Refresh T3 Code from its official nightly channel during both Home Manager
+  # activation and agentbox-update. It stays in the managed npm-global prefix.
+  home.activation.t3Code = lib.hm.dag.entryBetween [ "reloadSystemd" ] [ "writeBoundary" ] ''
     export NPM_CONFIG_PREFIX="$HOME/.npm-global"
     export PATH="${pkgs.nodejs_24}/bin:$HOME/.npm-global/bin:$PATH"
-    ${pkgs.nodejs_24}/bin/npm install --global --no-audit --no-fund t3@0.0.38 < /dev/null
+    ${pkgs.nodejs_24}/bin/npm install --global --no-audit --no-fund ${t3CodeNpmPackage} < /dev/null
   '';
 
   systemd.user.services.t3code = {

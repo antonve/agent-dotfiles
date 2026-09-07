@@ -42,7 +42,7 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   daily backup-first image updates and its CLI installed at `~/.local/bin/draft`.
   It has no application authentication and both ports bind to loopback only;
   the SSH helper forwards the web UI to `http://127.0.0.1:8765`.
-- **T3 Code 0.0.38** as a boot-persistent systemd user service. It reuses the
+- **T3 Code nightly** as a boot-persistent systemd user service. It reuses the
   installed provider CLI authentication, binds only to loopback, and is
   forwarded by the SSH helper to `http://127.0.0.1:8784`.
 - **Global agent instructions**: one `files/AGENTS.md` linked to
@@ -93,6 +93,12 @@ local UI. Treat the pairing token as a secret: never copy it into chats,
 additional logs, or tracked files, and do not share it. To use a different
 port, set `T3CODE_PORT` in the untracked `~/.config/agentbox/secrets.env` and
 use a matching SSH forward.
+
+Home Manager activation and `agentbox-update` both refresh T3 Code from the
+official moving npm `nightly` tag. To roll back to the stable channel, change
+`t3CodeNpmPackage` in `home.nix` from `t3@nightly` to `t3@latest`, then run the
+Home Manager switch command below. The install must keep lifecycle scripts
+enabled because T3 Code includes native dependencies.
 
 ## Day-2 commands
 
