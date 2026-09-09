@@ -39,6 +39,11 @@ let
     runtimeInputs = with pkgs; [ coreutils gnugrep jq ];
     text = builtins.readFile ./pi-theme.sh;
   };
+  ponytailUpdate = pkgs.writeShellApplication {
+    name = "ponytail-update";
+    runtimeInputs = with pkgs; [ coreutils git jq nodejs_24 ];
+    text = builtins.readFile ./ponytail-update.sh;
+  };
   agentboxDiskReclaim = pkgs.writeShellApplication {
     name = "agentbox-disk-reclaim";
     runtimeInputs = with pkgs; [ coreutils gawk util-linux ];
@@ -80,6 +85,9 @@ let
     npm install --global --no-audit --no-fund ${t3CodeNpmPackage} < /dev/null
 
     ${piAgentUpdate}/bin/pi-agent-update
+
+    echo "==> ponytail plugins"
+    ${ponytailUpdate}/bin/ponytail-update
 
     skill() { # skill <repo> <name>
       timeout 300 npx --yes skills add "$1" --skill "$2" -g -y \
@@ -178,6 +186,7 @@ in
     herdrPkg
     treehousePkg
     agentboxUpdate
+    ponytailUpdate
     piAgentUpdate
     piTheme
     piWrapper
@@ -467,6 +476,10 @@ in
   # is deliberately left untouched.
   home.activation.piAgent = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     ${piAgentUpdate}/bin/pi-agent-update
+  '';
+
+  home.activation.ponytail = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ${ponytailUpdate}/bin/ponytail-update
   '';
 
   home.activation.piSetup = lib.hm.dag.entryAfter [ "piAgent" ] ''

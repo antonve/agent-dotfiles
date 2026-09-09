@@ -21,7 +21,7 @@ check() { # check <description> <command...>
 for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
            add-ssh-key agentbox-update agentbox-disk-reclaim draft-standalone pi-agent-update claude codex opencode pi t3 \
            docker \
-           gh-axi quota-axi \
+           gh-axi quota-axi ponytail-update \
            gopls typescript-language-server terraform-ls lua-language-server nil gcc; do
   check "command available: $cmd" command -v "$cmd"
 done
@@ -37,6 +37,10 @@ for f in .claude/CLAUDE.md .codex/AGENTS.md .config/opencode/AGENTS.md .pi/agent
   check "agent instructions: ~/$f" test -s "$HOME/$f"
 done
 check "AGENTS.md restricts GitHub writes" grep -q 'github-write-owners' "$HOME/.claude/CLAUDE.md"
+check "Ponytail enabled in Claude" jq -e '.enabledPlugins["ponytail@ponytail"] == true' "$HOME/.claude/settings.json"
+check "Ponytail enabled in Codex" sh -c 'codex plugin list --json --marketplace ponytail | jq -e '\''.installed | any(.pluginId == "ponytail@ponytail" and .enabled == true)'\'''
+check "Ponytail OpenCode adapter exists" test -s "$HOME/.local/share/agentbox/ponytail/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs"
+check "Ponytail configured in OpenCode" jq -e --arg plugin "$HOME/.local/share/agentbox/ponytail/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs" '.plugin | index($plugin) != null' "$HOME/.config/opencode/opencode.json"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
 echo "==> installing nvim plugins headlessly (lazy.nvim + treesitter)"

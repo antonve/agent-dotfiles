@@ -44,13 +44,14 @@ see its README for setup and activation commands.
 ## GitHub and consequential actions
 
 - Commit completed task changes automatically and push to that task’s existing PR.
-  If no PR exists for the task, ask whether to open one and wait for the user’s
-  instruction; do not create a PR automatically.
+  If no PR exists, push the task branch and open a draft PR automatically once
+  the work is ready for review and appropriate verification is complete. Do not
+  ask for permission to create the draft PR unless the user has instructed otherwise.
 - GitHub writes are allowed only for the authenticated account or owners in
   `~/.config/agentbox/github-write-owners`. Never change that allowlist or bypass
   guards without an explicit user request to change the policy.
-- Create PRs as drafts for every owner other than exactly `antonve`, and preserve
-  draft status. Only an explicit override for that PR permits marking it ready.
+- Create PRs as drafts for every owner and preserve draft status. Only an explicit
+  override for that PR permits marking it ready.
 - Do not notify/tag people, request reviews, or solicit attention without explicit
   authorization for that action.
 - Bypass repository rules only with explicit authorization for that merge, all
