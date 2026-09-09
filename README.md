@@ -30,6 +30,12 @@ agent CLIs, and wires herdr up as a boot-persistent service.
 - **treehouse** (from its nix flake) is available for pooled git worktrees.
 - **axi tools**: `gh-axi` and `quota-axi` with their skills and `gh-axi`
   SessionStart hooks (deliberately no lavish-axi).
+- **Ponytail**: native Claude Code and Codex plugins, plus the OpenCode adapter,
+  installed/refreshed by Home Manager activation and `agentbox-update`. OpenCode
+  loads the npm package from `~/.local/share/agentbox/ponytail`; its existing
+  settings and other plugins are preserved. Start new agent sessions after
+  installation. In Codex, open `/hooks` and trust Ponytail's lifecycle hooks
+  to enable automatic activation. The shared Agent Box instructions stay in place.
 - **Dev tooling** from nixpkgs: git, gh, aws, gcloud, node, terraform, rg, fd,
   jq, fzf, make, htop, and a common Go toolset (`gopls`, `golangci-lint`,
   `dlv`, `gofumpt`, `goimports`, `staticcheck`, and `govulncheck`).
@@ -108,6 +114,7 @@ enabled because T3 Code includes native dependencies.
 |---|---|
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
 | `agentbox-update` | refresh all agent CLIs, the local `pi-agent` checkout, axi tools and skills |
+| `ponytail-update` | refresh the Ponytail plugins for Claude, Codex, and OpenCode |
 | `systemctl --user status t3code.service` | inspect the persistent loopback-only T3 Code service |
 | `agentbox-disk-reclaim` | reclaim safe disposable data when `/` is above 80% usage |
 | `draft-standalone status` | show the Draft Compose services and health |
