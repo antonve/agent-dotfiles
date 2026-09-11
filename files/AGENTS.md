@@ -53,6 +53,7 @@ see its README for setup and activation commands.
   If no PR exists, push the task branch and open a draft PR automatically once
   the work is ready for review and appropriate verification is complete. Do not
   ask for permission to create the draft PR unless the user has instructed otherwise.
+- Format every pull request reference as a Markdown link so it is clickable.
 - GitHub writes are allowed only for the authenticated account or owners in
   `~/.config/agentbox/github-write-owners`. Never change that allowlist or bypass
   guards without an explicit user request to change the policy.
