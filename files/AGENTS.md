@@ -43,6 +43,12 @@ see its README for setup and activation commands.
 
 ## GitHub and consequential actions
 
+- Prefix every model-authored GitHub reply with this header, substituting the
+  model's name for `$modelName`:
+  ```md
+  > [!NOTE]
+  > 🤖 **$modelName responding on behalf of Anton**
+  ```
 - Commit completed task changes automatically and push to that task’s existing PR.
   If no PR exists, push the task branch and open a draft PR automatically once
   the work is ready for review and appropriate verification is complete. Do not
