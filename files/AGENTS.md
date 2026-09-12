@@ -16,6 +16,10 @@ see its README for setup and activation commands.
 
 ## Scope and ownership
 
+- Never infer task scope. Treat only work explicitly requested or confirmed by
+  the user as in scope. If any boundary is unclear—including whether work should
+  or should not be done—stop and ask before proceeding. Do not add unrequested
+  code or complexity.
 - Classify ownership before repository work. Third-party upstream repositories
   are read-only: documentation/source inspection for diagnosis is allowed, but
   never plan or implement changes, create patches/branches, delegate changes,
