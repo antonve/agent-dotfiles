@@ -21,7 +21,7 @@ check() { # check <description> <command...>
 for cmd in nvim vim vi git gh aws gcloud herdr treehouse rg fd jq fzf node go \
            add-ssh-key agentbox-update agentbox-disk-reclaim draft-standalone pi-agent-update claude codex opencode pi t3 \
            docker \
-           gh-axi quota-axi ponytail-update \
+           gh-axi quota-axi ponytail-update pstack-update \
            gopls typescript-language-server terraform-ls lua-language-server nil gcc; do
   check "command available: $cmd" command -v "$cmd"
 done
@@ -41,6 +41,9 @@ check "Ponytail enabled in Claude" jq -e '.enabledPlugins["ponytail@ponytail"] =
 check "Ponytail enabled in Codex" sh -c 'codex plugin list --json --marketplace ponytail | jq -e '\''.installed | any(.pluginId == "ponytail@ponytail" and .enabled == true)'\'''
 check "Ponytail OpenCode adapter exists" test -s "$HOME/.local/share/agentbox/ponytail/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs"
 check "Ponytail configured in OpenCode" jq -e --arg plugin "$HOME/.local/share/agentbox/ponytail/node_modules/@dietrichgebert/ponytail/.opencode/plugins/ponytail.mjs" '.plugin | index($plugin) != null' "$HOME/.config/opencode/opencode.json"
+check "pstack-agentbox enabled in Codex" sh -c 'codex plugin list --json --marketplace agent-dotfiles | jq -e '\''.installed | any(.pluginId == "pstack-agentbox@agent-dotfiles" and .enabled == true)'\'''
+check "pstack source contract" bash "$HOME/xdev/personal/agent-dotfiles/test/pstack.sh"
+check "pstack runtime contract" node --test "$HOME/xdev/personal/agent-dotfiles/test/pstack-runtime.test.mjs"
 
 check "nvim config linked" test -f "$HOME/.config/nvim/init.lua"
 echo "==> installing nvim plugins headlessly (lazy.nvim + treesitter)"
@@ -148,7 +151,7 @@ check "herdr auto-attach has file opt-out" grep -q '.no-herdr' "$HOME/.bashrc"
 check "herdr skill installed for claude" sh -c 'ls "$HOME"/.claude/skills/*herdr*/SKILL.md 2>/dev/null | grep -q .'
 check "gh-axi skill installed (universal)" test -f "$HOME/.agents/skills/gh-axi/SKILL.md"
 for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills .pi/agent/skills; do
-  check "bro skill installed: ~/$root" test -f "$HOME/$root/bro/SKILL.md"
+  check "bro skill absent: ~/$root" sh -c "[ ! -e \"\$HOME/$root/bro\" ]"
 done
 for root in .agents/skills .claude/skills .codex/skills .config/opencode/skills; do
   check "Draft skill installed: ~/$root" test -f \
@@ -159,6 +162,7 @@ check "claude commit attribution disabled" sh -c \
   '[ "$(jq -r .attribution.commit "$HOME/.claude/settings.json")" = "" ]'
 check "AGENTS.md forbids AI trailers" grep -qi "Co-Authored-By" "$HOME/.claude/CLAUDE.md"
 check "AGENTS.md forbids default commit amends and force pushes" grep -q 'Do not amend existing commits or force-push branches by default' "$HOME/.claude/CLAUDE.md"
+check "AGENTS.md scopes pstack GitHub exceptions" grep -q 'explicitly active pstack workflow' "$HOME/.claude/CLAUDE.md"
 
 check "command available: starship" command -v starship
 check "bashrc inits starship" grep -q starship "$HOME/.bashrc"

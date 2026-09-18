@@ -1,0 +1,20 @@
+{
+  "name": "agent-dotfiles",
+  "interface": {
+    "displayName": "Agent Box"
+  },
+  "plugins": [
+    {
+      "name": "pstack-agentbox",
+      "source": {
+        "source": "local",
+        "path": "./plugins/pstack-agentbox"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
