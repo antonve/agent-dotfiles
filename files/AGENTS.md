@@ -14,6 +14,8 @@ see its README for setup and activation commands.
 - Prefer `gh-axi` for GitHub and `quota-axi` for provider usage; use their skills
   for operational details. An explicitly active pstack workflow may choose a
   different authorized GitHub interface when its playbook calls for one.
+- Use `pup` to access Datadog. No external-service MCP servers or connectors are
+  configured; do not assume they are available.
 
 ## Scope and ownership
 
