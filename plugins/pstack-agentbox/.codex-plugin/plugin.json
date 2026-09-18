@@ -1,0 +1,35 @@
+{
+  "name": "pstack-agentbox",
+  "version": "0.1.0",
+  "description": "Explicit Codex engineering workflows derived from pstack and adapted for Agent Box.",
+  "author": {
+    "name": "Agent Box maintainers"
+  },
+  "homepage": "https://github.com/antonve/agent-dotfiles",
+  "repository": "https://github.com/antonve/agent-dotfiles",
+  "license": "MIT",
+  "keywords": [
+    "pstack",
+    "codex",
+    "engineering-workflows",
+    "poteto-mode"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "pstack for Agent Box",
+    "shortDescription": "Explicit Codex engineering workflows",
+    "longDescription": "A curated Codex-native derivative of pstack for planning, implementation, review, and verification in Agent Box. Graphite, Benny, bot UI, and bro are excluded.",
+    "developerName": "Agent Box maintainers",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Plan engineering work",
+      "Coordinate bounded agents",
+      "Review and verify changes"
+    ],
+    "defaultPrompt": [
+      "Use $poteto-mode for this engineering task.",
+      "Use $architect to design this change.",
+      "Use $blast-radius to assess this change."
+    ]
+  }
+}

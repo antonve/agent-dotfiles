@@ -36,6 +36,14 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   settings and other plugins are preserved. Start new agent sessions after
   installation. In Codex, open `/hooks` and trust Ponytail's lifecycle hooks
   to enable automatic activation. The shared Agent Box instructions stay in place.
+- **pstack for Agent Box**: an explicit-only Codex plugin derived from Lauren
+  Tan's pstack and its Codex port. It keeps the planning, implementation,
+  review, verification, and bounded-agent skills. Multi-phase plans use Draft.
+  Graphite, Benny automation, bot UI, and `bro` are intentionally excluded.
+  Active pstack workflows may choose PR readiness and an authorized GitHub
+  interface; ordinary Agent Box sessions keep the normal defaults. In Codex,
+  open `/hooks` and trust pstack's lifecycle hooks if Poteto Mode should remain
+  active across turns.
 - **Dev tooling** from nixpkgs: git, gh, aws, gcloud, node, terraform, rg, fd,
   jq, fzf, make, htop, and a common Go toolset (`gopls`, `golangci-lint`,
   `dlv`, `gofumpt`, `goimports`, `staticcheck`, and `govulncheck`).
@@ -56,9 +64,8 @@ agent CLIs, and wires herdr up as a boot-persistent service.
   and `~/.pi/agent/AGENTS.md`. Agents commit task changes and push to an existing
   task PR; when none exists, they automatically open a draft PR once the work
   is ready for review and appropriate verification is complete. PRs stay drafts
-  unless explicitly authorized otherwise for that PR.
-  The vendored user-invoked `bro` skill is also
-  available in every harness for restating the last response without jargon.
+  unless explicitly authorized otherwise for that PR or an explicitly active
+  pstack workflow selects ready status.
 - **Managed Pi package**: selectable GitHub Dark or Gruvbox Dark UI, `ask_user`, `/copy-all`, calm
   collapsed tool output, structured system `fd`/`rg`, Git/model dashboard
   state, Linear read/write tools, per-run summaries, and visible Herdr orchestration for background
@@ -117,6 +124,7 @@ enabled because T3 Code includes native dependencies.
 | `add-ssh-key "ssh-ed25519 AAAA… you@host"` | grant SSH access (dedupes) |
 | `agentbox-update` | refresh all agent CLIs, the local `pi-agent` checkout, axi tools and skills |
 | `ponytail-update` | refresh the Ponytail plugins for Claude, Codex, and OpenCode |
+| `pstack-update` | install or refresh the repo-managed pstack Codex plugin |
 | `systemctl --user status t3code.service` | inspect the persistent loopback-only T3 Code service |
 | `agentbox-disk-reclaim` | reclaim safe disposable data when `/` is above 80% usage |
 | `draft-standalone status` | show the Draft Compose services and health |

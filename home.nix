@@ -44,6 +44,11 @@ let
     runtimeInputs = with pkgs; [ coreutils git jq nodejs_24 ];
     text = builtins.readFile ./ponytail-update.sh;
   };
+  pstackUpdate = pkgs.writeShellApplication {
+    name = "pstack-update";
+    runtimeInputs = with pkgs; [ coreutils jq ];
+    text = builtins.readFile ./pstack-update.sh;
+  };
   agentboxDiskReclaim = pkgs.writeShellApplication {
     name = "agentbox-disk-reclaim";
     runtimeInputs = with pkgs; [ coreutils gawk util-linux ];
@@ -88,6 +93,9 @@ let
 
     echo "==> ponytail plugins"
     ${ponytailUpdate}/bin/ponytail-update
+
+    echo "==> pstack plugin"
+    ${pstackUpdate}/bin/pstack-update
 
     skill() { # skill <repo> <name>
       timeout 300 npx --yes skills add "$1" --skill "$2" -g -y \
@@ -187,6 +195,7 @@ in
     treehousePkg
     agentboxUpdate
     ponytailUpdate
+    pstackUpdate
     piAgentUpdate
     piTheme
     piWrapper
@@ -448,14 +457,6 @@ in
   home.file.".config/opencode/AGENTS.md".source = agentsMd;
   home.file.".pi/agent/AGENTS.md".source = agentsMd;
 
-  # Small vendored user-invoked skill, available in every harness without
-  # depending on the upstream dotfiles repository at runtime.
-  home.file.".agents/skills/bro".source = ./files/skills/bro;
-  home.file.".claude/skills/bro".source = ./files/skills/bro;
-  home.file.".codex/skills/bro".source = ./files/skills/bro;
-  home.file.".config/opencode/skills/bro".source = ./files/skills/bro;
-  home.file.".pi/agent/skills/bro".source = ./files/skills/bro;
-
   # Draft's workflow ships with the mutable Pi package and is linked into the
   # other harnesses from that one checkout.
   home.file.".agents/skills/draft-review-workflow".source =
@@ -480,6 +481,10 @@ in
 
   home.activation.ponytail = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     ${ponytailUpdate}/bin/ponytail-update
+  '';
+
+  home.activation.pstack = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ${pstackUpdate}/bin/pstack-update
   '';
 
   home.activation.piSetup = lib.hm.dag.entryAfter [ "piAgent" ] ''

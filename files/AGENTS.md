@@ -12,7 +12,8 @@ see its README for setup and activation commands.
 - Bind temporary previews to loopback on an available port in `8766`–`8783`.
   Port `8784` is reserved for T3 Code. Do not stop shared services.
 - Prefer `gh-axi` for GitHub and `quota-axi` for provider usage; use their skills
-  for operational details.
+  for operational details. An explicitly active pstack workflow may choose a
+  different authorized GitHub interface when its playbook calls for one.
 - Use `pup` to access Datadog. No external-service MCP servers or connectors are
   configured; do not assume they are available.
 
@@ -59,12 +60,15 @@ see its README for setup and activation commands.
   If no PR exists, push the task branch and open a draft PR automatically once
   the work is ready for review and appropriate verification is complete. Do not
   ask for permission to create the draft PR unless the user has instructed otherwise.
+  An explicitly active pstack workflow may instead choose draft or ready status
+  from its task state.
 - Format every pull request reference as a Markdown link so it is clickable.
 - GitHub writes are allowed only for the authenticated account or owners in
   `~/.config/agentbox/github-write-owners`. Never change that allowlist or bypass
   guards without an explicit user request to change the policy.
-- Create PRs as drafts for every owner and preserve draft status. Only an explicit
-  override for that PR permits marking it ready.
+- Create PRs as drafts for every owner and preserve draft status by default. Only
+  an explicit override for that PR or an explicitly active pstack workflow may
+  choose ready status.
 - Do not notify/tag people, request reviews, or solicit attention without explicit
   authorization for that action.
 - Bypass repository rules only with explicit authorization for that merge, all
