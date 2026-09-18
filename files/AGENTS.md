@@ -13,6 +13,8 @@ see its README for setup and activation commands.
   Port `8784` is reserved for T3 Code. Do not stop shared services.
 - Prefer `gh-axi` for GitHub and `quota-axi` for provider usage; use their skills
   for operational details.
+- Use `pup` to access Datadog. No external-service MCP servers or connectors are
+  configured; do not assume they are available.
 
 ## Scope and ownership
 
